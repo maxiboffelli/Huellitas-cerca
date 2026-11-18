@@ -1,4 +1,4 @@
-const PROD_API_URL = "https://TU-BACKEND.vercel.app";
+const PROD_API_URL = "https://huellitas-cerca-backend.vercel.app";
 const isLocal = !window.location.hostname || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const API_BASE = isLocal ? "http://127.0.0.1:8000" : PROD_API_URL.replace(/\/$/, "");
 
