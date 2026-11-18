@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Gestión - Huellitas Cerca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="js/config.js"></script>
+    <script>tailwind.config = TAILWIND_BRAND_CONFIG;</script>
+</head>
+<body class="bg-brand-bg text-brand-textDark font-sans min-h-screen">
+
+    <header id="app-header" class="bg-brand-bg border-b border-brand-tagBg sticky top-0 z-50"></header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <!-- BARRA SUPERIOR DE BIENVENIDA -->
+        <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg flex flex-wrap justify-between items-center gap-4">
+            <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span id="user-badge-role" class="px-3 py-1 rounded-pill bg-brand-primary text-white text-[11px] font-bold uppercase tracking-wider"></span>
+                    <span id="user-insignia" class="hidden"></span>
+                </div>
+                <h1 id="user-welcome" class="font-serif font-bold text-2xl text-brand-textDark"></h1>
+                <p id="user-partido-subtitle" class="text-xs text-brand-textMuted font-medium"></p>
+            </div>
+            <button onclick="logout()" class="px-5 py-2.5 bg-brand-tagBg hover:bg-brand-accent hover:text-white rounded-pill text-xs font-bold transition-colors">
+                <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VISTA EXCLUSIVA: ADMINISTRADOR MUNICIPAL   -->
+        <!-- ========================================== -->
+        <div id="view-admin-municipal" class="hidden space-y-8">
+            <!-- BARRA DE MÉTRICAS DEL PARTIDO -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-textMuted">Animales Activos</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="met-animales-activos" class="font-serif font-bold text-3xl text-brand-textDark">-</span>
+                        <i class="fa-solid fa-paw text-brand-accent text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-brand-textMuted mt-1">En adopción y perdidos</span>
+                </div>
+                <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-textMuted">Casos Resueltos</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="met-animales-resueltos" class="font-serif font-bold text-3xl text-brand-greenBadge">-</span>
+                        <i class="fa-solid fa-circle-check text-brand-greenBadge text-xl"></i>
+                    </div>
+                    <span class="text-[11px] text-brand-textMuted mt-1">Adopciones y reencuentros</span>
+                </div>
+                <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-textMuted">Refugios del Partido</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="met-refugios-total" class="font-serif font-bold text-3xl text-brand-textDark">-</span>
+                        <i class="fa-solid fa-house-chimney-medical text-brand-primary text-xl"></i>
+                    </div>
+                    <span id="met-refugios-sub" class="text-[11px] text-brand-textMuted mt-1">- con sello oficial</span>
+                </div>
+                <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-textMuted">Campañas Oficiales</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="met-campanas-activas" class="font-serif font-bold text-3xl text-brand-accent">-</span>
+                        <i class="fa-solid fa-syringe text-brand-accent text-xl"></i>
+                    </div>
+                    <span id="met-campanas-sub" class="text-[11px] text-brand-textMuted mt-1">- operativos activos</span>
+                </div>
+            </div>
+
+            <!-- NAVEGACIÓN POR PESTAÑAS (ADMIN MUNICIPAL) -->
+            <div class="bg-brand-card rounded-card p-2 border border-brand-tagBg flex flex-wrap gap-2">
+                <button id="tab-btn-animales" onclick="cambiarPestanaAdmin('animales')" class="px-5 py-2.5 rounded-pill text-xs font-bold transition-colors bg-brand-accent text-white">
+                    <i class="fa-solid fa-paw mr-1.5"></i> Animales del Partido
+                </button>
+                <button id="tab-btn-refugios" onclick="cambiarPestanaAdmin('refugios')" class="px-5 py-2.5 rounded-pill text-xs font-bold transition-colors bg-brand-tagBg text-brand-textDark hover:bg-brand-tagBg/80">
+                    <i class="fa-solid fa-certificate mr-1.5"></i> Refugios del Partido
+                </button>
+                <button id="tab-btn-campanas" onclick="cambiarPestanaAdmin('campanas')" class="px-5 py-2.5 rounded-pill text-xs font-bold transition-colors bg-brand-tagBg text-brand-textDark hover:bg-brand-tagBg/80">
+                    <i class="fa-solid fa-bullhorn mr-1.5"></i> Campañas Oficiales
+                </button>
+                <button id="tab-btn-nueva" onclick="cambiarPestanaAdmin('nueva')" class="px-5 py-2.5 rounded-pill text-xs font-bold transition-colors bg-brand-tagBg text-brand-textDark hover:bg-brand-tagBg/80">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Nueva Publicación
+                </button>
+            </div>
+
+            <!-- PESTAÑA 1: ANIMALES DEL PARTIDO -->
+            <div id="pane-admin-animales" class="space-y-6">
+                <div class="flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h2 class="font-serif font-bold text-2xl text-brand-textDark">Animales Publicados en el Partido</h2>
+                        <p class="text-xs text-brand-textMuted mt-1">Supervisión integral de animales en adopción y reportes vecinales del municipio.</p>
+                    </div>
+                    <!-- Filtro por estado para el admin -->
+                    <div class="flex items-center gap-2 bg-brand-card p-1.5 rounded-pill border border-brand-tagBg text-xs">
+                        <span class="text-brand-textMuted px-2 font-bold uppercase text-[10px]">Filtrar:</span>
+                        <button onclick="filtrarAnimalesAdmin('ACTIVA')" id="filtro-estado-ACTIVA" class="px-3 py-1 rounded-pill font-bold bg-brand-accent text-white">Activas</button>
+                        <button onclick="filtrarAnimalesAdmin('RESUELTA')" id="filtro-estado-RESUELTA" class="px-3 py-1 rounded-pill font-bold text-brand-textMuted hover:text-brand-textDark">Resueltas</button>
+                        <button onclick="filtrarAnimalesAdmin('PAUSADA')" id="filtro-estado-PAUSADA" class="px-3 py-1 rounded-pill font-bold text-brand-textMuted hover:text-brand-textDark">Pausadas</button>
+                    </div>
+                </div>
+
+                <div id="grid-admin-animales" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- PESTAÑA 2: REFUGIOS DEL PARTIDO -->
+            <div id="pane-admin-refugios" class="hidden space-y-6">
+                <div>
+                    <h2 class="font-serif font-bold text-2xl text-brand-textDark">Red de Refugios y Hogares del Partido</h2>
+                    <p class="text-xs text-brand-textMuted mt-1">Otorga el respaldo oficial del municipio a los refugios comprometidos con el bienestar animal.</p>
+                </div>
+                <div id="grid-admin-refugios" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- PESTAÑA 3: CAMPAÑAS OFICIALES -->
+            <div id="pane-admin-campanas" class="hidden space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Formulario Crear Campaña -->
+                    <div class="lg:col-span-5 bg-brand-card rounded-card p-6 border border-brand-greenBadge space-y-4">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-pill bg-brand-greenBadge text-white text-[10px] font-bold uppercase">Zoonosis Oficial</span>
+                            <span class="text-xs text-brand-textMuted">Nuevo Operativo</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-xl text-brand-textDark">Crear Campaña Oficial</h3>
+                        <form id="form-admin-campana" class="space-y-3 text-sm">
+                            <div>
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Título del Operativo</label>
+                                <input type="text" id="ac-titulo" required placeholder="Ej: Jornada Móvil de Vacunación Antirrábica" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tipo de Servicio</label>
+                                <select id="ac-tipo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                    <option value="CASTRACION_Y_VACUNACION">Castración y Vacunación Antirrábica</option>
+                                    <option value="VACUNACION">Solo Vacunación Antirrábica</option>
+                                    <option value="CASTRACION">Solo Castración Gratuita</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Fecha Inicio</label>
+                                    <input type="date" id="ac-inicio" required class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Fecha Fin</label>
+                                    <input type="date" id="ac-fin" required class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Horario de Atención</label>
+                                <input type="text" id="ac-horario" required placeholder="Ej: 08:30 a 13:00 hs (por orden de llegada)" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Ubicación / Punto Móvil</label>
+                                <input type="text" id="ac-ubicacion" required placeholder="Ej: Plaza Moreno (Av. 13 y 50)" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Requisitos para Vecinos</label>
+                                <textarea id="ac-req" rows="2" required placeholder="Ej: Ayuno de 12 hs agua y comida, perros con correa y bozal, gatos en bolsa de red/transportadora..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-brand-greenBadge hover:bg-brand-greenBadge/90 text-white rounded-pill font-bold transition-colors">
+                                Publicar Campaña Municipal &rarr;
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Listado de Campañas Oficiales -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-serif font-bold text-xl text-brand-textDark">Operativos del Municipio</h3>
+                            <span id="badge-total-campanas" class="text-xs text-brand-textMuted font-bold"></span>
+                        </div>
+                        <div id="lista-admin-campanas" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 4: NUEVA PUBLICACIÓN (ADMIN MUNICIPAL) -->
+            <div id="pane-admin-nueva" class="hidden">
+                <div class="max-w-2xl mx-auto bg-brand-card rounded-card p-6 md:p-8 border border-brand-tagBg space-y-6">
+                    <div>
+                        <span class="px-2.5 py-0.5 rounded-pill bg-brand-accent text-white text-[10px] font-bold uppercase">Publicación Oficial</span>
+                        <h2 class="font-serif font-bold text-2xl text-brand-textDark mt-1">Publicar Animal en el Municipio</h2>
+                        <p class="text-xs text-brand-textMuted mt-1">Esta publicación contará automáticamente con el sello de verificación municipal.</p>
+                    </div>
+                    <form id="form-mascota-admin" class="space-y-4 text-sm">
+                        <!-- Componente reutilizable de formulario -->
+                        <div id="fields-mascota-admin"></div>
+                        <button type="submit" class="w-full py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
+                            Publicar Animal con Sello Municipal &rarr;
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VISTA: REFUGIO / CIUDADANO                 -->
+        <!-- ========================================== -->
+        <div id="view-user-standard" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- FORMULARIO NUEVA PUBLICACIÓN -->
+            <section class="lg:col-span-5 space-y-6">
+                <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg space-y-4">
+                    <div>
+                        <h2 class="font-serif font-bold text-xl text-brand-textDark">Nueva Publicación</h2>
+                        <p class="text-xs text-brand-textMuted mt-0.5">Difundí animales en adopción o reportá mascotas perdidas.</p>
+                    </div>
+                    <form id="form-mascota-user" class="space-y-3.5 text-sm">
+                        <div id="fields-mascota-user"></div>
+                        <button type="submit" class="w-full py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
+                            Publicar Ahora &rarr;
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- MIS PUBLICACIONES (SEPARADAS EN ACTIVAS Y RESUELTAS) -->
+            <section class="lg:col-span-7 space-y-6">
+                <div class="bg-brand-card rounded-card p-4 border border-brand-tagBg flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="font-serif font-bold text-xl text-brand-textDark">Mis Publicaciones</h2>
+                    <div class="flex items-center gap-1.5 bg-brand-tagBg/60 p-1 rounded-pill text-xs">
+                        <button id="btn-subtab-activas" onclick="cambiarSubtabUser('activas')" class="px-4 py-1.5 rounded-pill font-bold bg-brand-card text-brand-textDark border border-brand-tagBg transition-colors">
+                            Activas (<span id="count-user-activas">0</span>)
+                        </button>
+                        <button id="btn-subtab-resueltas" onclick="cambiarSubtabUser('resueltas')" class="px-4 py-1.5 rounded-pill font-bold text-brand-textMuted hover:text-brand-textDark transition-colors">
+                            Resueltas (<span id="count-user-resueltas">0</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR PUBLICACIONES ACTIVAS -->
+                <div id="lista-user-activas" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+
+                <!-- CONTENEDOR PUBLICACIONES RESUELTAS -->
+                <div id="lista-user-resueltas" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentUser = null;
+        let adminEstadoFiltro = "ACTIVA";
+        let subtabUserActiva = "activas";
+        let misPublicacionesCache = [];
+
+        // Plantilla de inputs del formulario de mascota para no duplicar código
+        function getMascotaFormHTML(prefix) {
+            return `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tipo de Publicación</label>
+                        <select id="${prefix}-tipo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            <option value="ADOPCION">En Adopción Responsable</option>
+                            <option value="PERDIDO">Animal Perdido (Busca a su familia)</option>
+                            <option value="ENCONTRADO">Animal Encontrado en vía pública</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Nombre / Referencia</label>
+                        <input type="text" id="${prefix}-nombre" required placeholder="Ej: Milo / Cachorro mestizo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Especie</label>
+                            <select id="${prefix}-especie" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <option value="PERRO">Perro</option>
+                                <option value="GATO">Gato</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Sexo</label>
+                            <select id="${prefix}-sexo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <option value="MACHO">Macho</option>
+                                <option value="HEMBRA">Hembra</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tamaño</label>
+                            <select id="${prefix}-tamano" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <option value="PEQUENO">Pequeño</option>
+                                <option value="MEDIANO">Mediano</option>
+                                <option value="GRANDE">Grande</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Edad</label>
+                            <select id="${prefix}-edad" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <option value="CACHORRO">Cachorro</option>
+                                <option value="ADULTO">Adulto</option>
+                                <option value="SENIOR">Senior (+7 años)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Barrio / Zona Exacta</label>
+                        <input type="text" id="${prefix}-zona" required placeholder="Ej: Barrio San Martín / Plaza Central" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">WhatsApp de Contacto (Opcional)</label>
+                        <input type="text" id="${prefix}-whatsapp" placeholder="Ej: 5491122334455" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">URL de la Foto</label>
+                        <input type="url" id="${prefix}-foto" required placeholder="https://images.unsplash.com/..." class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Descripción y Carácter</label>
+                        <textarea id="${prefix}-desc" rows="3" required placeholder="Contá su historia, temperamento con otros animales, cuidados especiales..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Estado Sanitario</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs bg-white p-3 rounded-card border border-brand-tagBg">
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-vac"> Vacunado</label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-rab"> Antirrábica</label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-est"> Esterilizado</label>
+                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-des"> Desparasitado</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function extractMascotaFormData(prefix) {
+            return {
+                tipo_publicacion: document.getElementById(`${prefix}-tipo`).value,
+                nombre: document.getElementById(`${prefix}-nombre`).value.trim(),
+                especie: document.getElementById(`${prefix}-especie`).value,
+                sexo: document.getElementById(`${prefix}-sexo`).value,
+                tamano: document.getElementById(`${prefix}-tamano`).value,
+                edad: document.getElementById(`${prefix}-edad`).value,
+                zona_barrio: document.getElementById(`${prefix}-zona`).value.trim(),
+                whatsapp_contacto: document.getElementById(`${prefix}-whatsapp`).value.trim() || undefined,
+                foto_url: document.getElementById(`${prefix}-foto`).value.trim(),
+                descripcion: document.getElementById(`${prefix}-desc`).value.trim(),
+                salud: {
+                    vacunado: document.getElementById(`${prefix}-vac`).checked,
+                    antirrabica: document.getElementById(`${prefix}-rab`).checked,
+                    esterilizado: document.getElementById(`${prefix}-est`).checked,
+                    desparasitado: document.getElementById(`${prefix}-des`).checked
+                }
+            };
+        }
+
+        // ==========================================
+        // FUNCIONES ADMIN MUNICIPAL
+        // ==========================================
+        function cambiarPestanaAdmin(tab) {
+            const tabs = ["animales", "refugios", "campanas", "nueva"];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const pane = document.getElementById(`pane-admin-${t}`);
+                if (t === tab) {
+                    btn.className = "px-5 py-2.5 rounded-pill text-xs font-bold transition-colors bg-brand-accent text-white";
+                    pane.classList.remove("hidden");
+                } else {
+                    btn.className = "px-5 py-2.5 rounded-pill text-xs font-bold transition-colors bg-brand-tagBg text-brand-textDark hover:bg-brand-tagBg/80";
+                    pane.classList.add("hidden");
+                }
+            });
+
+            if (tab === "animales") cargarAnimalesPartidoAdmin();
+            if (tab === "refugios") cargarRefugiosPartidoAdmin();
+            if (tab === "campanas") cargarCampanasAdmin();
+        }
+
+        async function cargarMetricasPartido() {
+            try {
+                const [activas, resueltas, refugios, campanas] = await Promise.all([
+                    apiFetch(`/mascotas?partido=${encodeURIComponent(currentUser.partido)}&estado=ACTIVA`).catch(() => []),
+                    apiFetch(`/mascotas?partido=${encodeURIComponent(currentUser.partido)}&estado=RESUELTA`).catch(() => []),
+                    apiFetch("/municipios/mi-panel/refugios").catch(() => []),
+                    apiFetch("/campanas/mis-campanas").catch(() => [])
+                ]);
+
+                document.getElementById("met-animales-activos").textContent = activas.length;
+                document.getElementById("met-animales-resueltos").textContent = resueltas.length;
+
+                const verificados = refugios.filter(r => r.verificado_municipio).length;
+                document.getElementById("met-refugios-total").textContent = refugios.length;
+                document.getElementById("met-refugios-sub").textContent = `${verificados} con sello oficial`;
+
+                const campActivas = campanas.filter(c => c.activa).length;
+                document.getElementById("met-campanas-activas").textContent = campActivas;
+                document.getElementById("met-campanas-sub").textContent = `${campActivas} de ${campanas.length} activas`;
+            } catch (err) {
+                console.error("Error al cargar métricas:", err);
+            }
+        }
+
+        function filtrarAnimalesAdmin(estado) {
+            adminEstadoFiltro = estado;
+            ["ACTIVA", "RESUELTA", "PAUSADA"].forEach(e => {
+                const b = document.getElementById(`filtro-estado-${e}`);
+                if (e === estado) {
+                    b.className = "px-3 py-1 rounded-pill font-bold bg-brand-accent text-white";
+                } else {
+                    b.className = "px-3 py-1 rounded-pill font-bold text-brand-textMuted hover:text-brand-textDark";
+                }
+            });
+            cargarAnimalesPartidoAdmin();
+        }
+
+        async function cargarAnimalesPartidoAdmin() {
+            const grid = document.getElementById("grid-admin-animales");
+            grid.innerHTML = `<div class="col-span-full text-center py-8 text-sm text-brand-textMuted">Cargando animales del partido...</div>`;
+
+            try {
+                const items = await apiFetch(`/mascotas?partido=${encodeURIComponent(currentUser.partido)}&estado=${adminEstadoFiltro}`);
+                if (items.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full bg-brand-card p-8 rounded-card border border-brand-tagBg text-center text-sm text-brand-textMuted">
+                            No hay publicaciones con estado <strong>${adminEstadoFiltro}</strong> en ${currentUser.partido}.
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = items.map(m => `
+                    <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="relative h-44 rounded-card overflow-hidden mb-3 border border-brand-tagBg">
+                                <img src="${m.foto_url}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600'">
+                                <div class="absolute top-2 left-2 flex flex-col gap-1">
+                                    <span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white bg-brand-primary uppercase">${m.tipo_publicacion}</span>
+                                    ${m.verificado_municipio ? `<span class="px-2 py-0.5 rounded-pill text-[9px] font-bold bg-brand-greenBadge text-white"><i class="fa-solid fa-certificate"></i> Verificado</span>` : ""}
+                                </div>
+                                <span class="absolute top-2 right-2 px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${
+                                    m.estado === 'ACTIVA' ? 'bg-brand-greenBadge' : m.estado === 'RESUELTA' ? 'bg-brand-primary' : 'bg-brand-textMuted'
+                                }">${m.estado}</span>
+                            </div>
+
+                            <h3 class="font-serif font-bold text-lg text-brand-textDark">${m.nombre}</h3>
+                            <p class="text-xs text-brand-textMuted mt-0.5">${m.especie} &bull; ${m.sexo} &bull; ${m.tamano} &bull; ${m.edad}</p>
+                            <p class="text-xs text-brand-textDark mt-1"><i class="fa-solid fa-location-dot text-brand-accent mr-1"></i> ${m.zona_barrio}</p>
+                            <p class="text-[11px] text-brand-textMuted mt-1">Por: <strong>${m.publicador_nombre || 'Usuario'}</strong> (${m.publicador_rol || 'CIUDADANO'})</p>
+                        </div>
+
+                        <div class="pt-2 border-t border-brand-tagBg flex flex-col gap-2">
+                            ${m.estado === "ACTIVA" ? `
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="cambiarEstadoMascotaAdmin('${m.id}', 'RESUELTA')" class="py-2 bg-brand-tagBg hover:bg-brand-greenBadge hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                        <i class="fa-solid fa-check mr-1"></i> Resuelta
+                                    </button>
+                                    <button onclick="cambiarEstadoMascotaAdmin('${m.id}', 'PAUSADA')" class="py-2 bg-brand-tagBg hover:bg-brand-accent hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                        <i class="fa-solid fa-pause mr-1"></i> Pausar
+                                    </button>
+                                </div>
+                            ` : m.estado === "PAUSADA" ? `
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button onclick="cambiarEstadoMascotaAdmin('${m.id}', 'ACTIVA')" class="py-2 bg-brand-tagBg hover:bg-brand-primary hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                        <i class="fa-solid fa-play mr-1"></i> Reactivar
+                                    </button>
+                                    <button onclick="cambiarEstadoMascotaAdmin('${m.id}', 'RESUELTA')" class="py-2 bg-brand-tagBg hover:bg-brand-greenBadge hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                        <i class="fa-solid fa-check mr-1"></i> Resuelta
+                                    </button>
+                                </div>
+                            ` : `
+                                <button onclick="cambiarEstadoMascotaAdmin('${m.id}', 'ACTIVA')" class="w-full py-2 bg-brand-tagBg hover:bg-brand-primary hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i> Reabrir Publicación
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `).join("");
+            } catch (err) {
+                grid.innerHTML = `<p class="col-span-full text-sm text-red-600">${err.message}</p>`;
+            }
+        }
+
+        async function cambiarEstadoMascotaAdmin(id, nuevoEstado) {
+            try {
+                await apiFetch(`/mascotas/${id}/estado`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ estado: nuevoEstado })
+                });
+                cargarAnimalesPartidoAdmin();
+                cargarMetricasPartido();
+            } catch (err) {
+                alert("Error al actualizar estado: " + err.message);
+            }
+        }
+
+        async function cargarRefugiosPartidoAdmin() {
+            const grid = document.getElementById("grid-admin-refugios");
+            grid.innerHTML = `<div class="col-span-full text-center py-8 text-sm text-brand-textMuted">Cargando refugios del partido...</div>`;
+
+            try {
+                const items = await apiFetch("/municipios/mi-panel/refugios");
+                if (items.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full bg-brand-card p-8 rounded-card border border-brand-tagBg text-center text-sm text-brand-textMuted">
+                            No hay cuentas de rol <strong>REFUGIO</strong> registradas aún en el partido de ${currentUser.partido}.
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = items.map(r => `
+                    <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <h3 class="font-serif font-bold text-xl text-brand-textDark">${r.nombre}</h3>
+                                ${r.verificado_municipio ? `
+                                    <span class="px-2.5 py-1 rounded-pill bg-brand-greenBadge text-white text-[11px] font-bold inline-flex items-center gap-1 shrink-0">
+                                        <i class="fa-solid fa-certificate"></i> Sello Activo
+                                    </span>
+                                ` : `
+                                    <span class="px-2.5 py-1 rounded-pill bg-brand-tagBg text-brand-textMuted text-[11px] font-bold inline-flex items-center gap-1 shrink-0">
+                                        <i class="fa-solid fa-shield-halved"></i> Sin Sello
+                                    </span>
+                                `}
+                            </div>
+                            <p class="text-xs text-brand-textMuted"><i class="fa-solid fa-envelope mr-1.5"></i> ${r.email}</p>
+                            ${r.whatsapp ? `
+                                <p class="text-xs text-brand-textDark">
+                                    <i class="fa-brands fa-whatsapp text-green-600 mr-1.5"></i>
+                                    <a href="https://wa.me/${r.whatsapp}" target="_blank" class="hover:underline">${r.whatsapp}</a>
+                                </p>
+                            ` : ""}
+                            <p class="text-[11px] text-brand-textMuted pt-1">
+                                Sede: <strong>${r.partido}</strong> &bull; Rol en plataforma: <strong>${r.rol}</strong>
+                            </p>
+                        </div>
+
+                        <div class="pt-3 border-t border-brand-tagBg">
+                            <button onclick="alternarVerificacionRefugio('${r.id}')" class="w-full py-2.5 rounded-pill text-xs font-bold transition-colors ${
+                                r.verificado_municipio
+                                    ? 'bg-brand-tagBg text-brand-textDark hover:bg-brand-accent hover:text-white'
+                                    : 'bg-brand-greenBadge text-white hover:bg-brand-greenBadge/90'
+                            }">
+                                <i class="fa-solid ${r.verificado_municipio ? 'fa-xmark' : 'fa-certificate'} mr-1.5"></i>
+                                ${r.verificado_municipio ? 'Quitar Sello Oficial' : 'Otorgar Sello Oficial'}
+                            </button>
+                        </div>
+                    </div>
+                `).join("");
+            } catch (err) {
+                grid.innerHTML = `<p class="col-span-full text-sm text-red-600">${err.message}</p>`;
+            }
+        }
+
+        async function alternarVerificacionRefugio(refugioId) {
+            try {
+                await apiFetch(`/municipios/mi-panel/refugios/${refugioId}/verificar`, {
+                    method: "PATCH"
+                });
+                cargarRefugiosPartidoAdmin();
+                cargarMetricasPartido();
+            } catch (err) {
+                alert("Error al actualizar verificación: " + err.message);
+            }
+        }
+
+        async function cargarCampanasAdmin() {
+            const list = document.getElementById("lista-admin-campanas");
+            const badgeTotal = document.getElementById("badge-total-campanas");
+            list.innerHTML = `<p class="text-sm text-brand-textMuted">Cargando operativos municipales...</p>`;
+
+            try {
+                const items = await apiFetch("/campanas/mis-campanas");
+                badgeTotal.textContent = `${items.length} campaña(s) registradas`;
+
+                if (items.length === 0) {
+                    list.innerHTML = `
+                        <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg text-center text-sm text-brand-textMuted">
+                            No hay campañas registradas para ${currentUser.partido}. Completá el formulario para lanzar la primera.
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = items.map(c => `
+                    <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${
+                                    c.activa ? 'bg-brand-greenBadge' : 'bg-brand-textMuted'
+                                }">${c.activa ? 'OPERATIVO ACTIVO' : 'FINALIZADA'}</span>
+                                <span class="text-xs font-bold text-brand-accent">${c.tipo}</span>
+                            </div>
+                            <h4 class="font-serif font-bold text-lg text-brand-textDark">${c.titulo}</h4>
+                            <div class="text-xs text-brand-textMuted space-y-0.5">
+                                <p><i class="fa-solid fa-calendar mr-1"></i> ${c.fecha_inicio} al ${c.fecha_fin} &bull; <i class="fa-solid fa-clock ml-2 mr-1"></i> ${c.horario}</p>
+                                <p><i class="fa-solid fa-location-dot mr-1"></i> ${c.ubicacion}</p>
+                                <p><i class="fa-solid fa-clipboard-list mr-1"></i> ${c.requisitos}</p>
+                            </div>
+                        </div>
+
+                        <button onclick="alternarEstadoCampana('${c.id}')" class="px-4 py-2 rounded-pill text-xs font-bold transition-colors shrink-0 ${
+                            c.activa
+                                ? 'bg-brand-tagBg text-brand-textDark hover:bg-brand-accent hover:text-white'
+                                : 'bg-brand-greenBadge text-white hover:bg-brand-greenBadge/90'
+                        }">
+                            <i class="fa-solid ${c.activa ? 'fa-flag-checkered' : 'fa-play'} mr-1.5"></i>
+                            ${c.activa ? 'Finalizar Operativo' : 'Reactivar Campaña'}
+                        </button>
+                    </div>
+                `).join("");
+            } catch (err) {
+                list.innerHTML = `<p class="text-sm text-red-600">${err.message}</p>`;
+            }
+        }
+
+        async function alternarEstadoCampana(campanaId) {
+            try {
+                await apiFetch(`/campanas/${campanaId}/estado`, {
+                    method: "PATCH"
+                });
+                cargarCampanasAdmin();
+                cargarMetricasPartido();
+            } catch (err) {
+                alert("Error al cambiar estado de la campaña: " + err.message);
+            }
+        }
+
+        // ==========================================
+        // FUNCIONES REFUGIO / CIUDADANO
+        // ==========================================
+        function cambiarSubtabUser(tab) {
+            subtabUserActiva = tab;
+            const btnActivas = document.getElementById("btn-subtab-activas");
+            const btnResueltas = document.getElementById("btn-subtab-resueltas");
+            const contActivas = document.getElementById("lista-user-activas");
+            const contResueltas = document.getElementById("lista-user-resueltas");
+
+            if (tab === "activas") {
+                btnActivas.className = "px-4 py-1.5 rounded-pill font-bold bg-brand-card text-brand-textDark border border-brand-tagBg transition-colors";
+                btnResueltas.className = "px-4 py-1.5 rounded-pill font-bold text-brand-textMuted hover:text-brand-textDark transition-colors";
+                contActivas.classList.remove("hidden");
+                contResueltas.classList.add("hidden");
+            } else {
+                btnResueltas.className = "px-4 py-1.5 rounded-pill font-bold bg-brand-card text-brand-textDark border border-brand-tagBg transition-colors";
+                btnActivas.className = "px-4 py-1.5 rounded-pill font-bold text-brand-textMuted hover:text-brand-textDark transition-colors";
+                contResueltas.classList.remove("hidden");
+                contActivas.classList.add("hidden");
+            }
+        }
+
+        async function cambiarEstadoMascotaUser(id, nuevoEstado) {
+            try {
+                await apiFetch(`/mascotas/${id}/estado`, {
+                    method: "PATCH",
+                    body: JSON.stringify({ estado: nuevoEstado })
+                });
+                await cargarMisPublicacionesUser();
+            } catch (err) {
+                alert("Error al actualizar publicación: " + err.message);
+            }
+        }
+
+        async function cargarMisPublicacionesUser() {
+            const contActivas = document.getElementById("lista-user-activas");
+            const contResueltas = document.getElementById("lista-user-resueltas");
+            const countActivas = document.getElementById("count-user-activas");
+            const countResueltas = document.getElementById("count-user-resueltas");
+
+            contActivas.innerHTML = `<p class="col-span-full text-sm text-brand-textMuted py-4">Cargando publicaciones activas...</p>`;
+            contResueltas.innerHTML = `<p class="col-span-full text-sm text-brand-textMuted py-4">Cargando publicaciones resueltas...</p>`;
+
+            try {
+                const items = await apiFetch("/mascotas/mis-publicaciones");
+                misPublicacionesCache = items;
+
+                // Si alguna publicación tiene verificado_municipio actualizado, sincronizar sesión
+                if (items.length > 0 && typeof items[0].verificado_municipio === "boolean") {
+                    if (currentUser.verificado_municipio !== items[0].verificado_municipio) {
+                        currentUser.verificado_municipio = items[0].verificado_municipio;
+                        localStorage.setItem("hc_user", JSON.stringify(currentUser));
+                        renderInsigniaUsuario();
+                    }
+                }
+
+                const activas = items.filter(m => m.estado === "ACTIVA" || m.estado === "PAUSADA");
+                const resueltas = items.filter(m => m.estado === "RESUELTA");
+
+                countActivas.textContent = activas.length;
+                countResueltas.textContent = resueltas.length;
+
+                // Render Activas
+                if (activas.length === 0) {
+                    contActivas.innerHTML = `
+                        <div class="col-span-full bg-brand-card rounded-card p-8 border border-brand-tagBg text-center text-sm text-brand-textMuted">
+                            No tenés publicaciones activas en este momento. Podés crear una desde el formulario contiguo.
+                        </div>
+                    `;
+                } else {
+                    contActivas.innerHTML = activas.map(m => `
+                        <div class="bg-brand-card rounded-card p-4 border border-brand-tagBg flex flex-col justify-between space-y-3">
+                            <div>
+                                <div class="relative h-40 rounded-card overflow-hidden mb-2 border border-brand-tagBg">
+                                    <img src="${m.foto_url}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600'">
+                                    <span class="absolute top-2 left-2 px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white bg-brand-primary uppercase">${m.tipo_publicacion}</span>
+                                    <span class="absolute top-2 right-2 px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${m.estado === 'ACTIVA' ? 'bg-brand-greenBadge' : 'bg-brand-textMuted'}">${m.estado}</span>
+                                </div>
+                                <h3 class="font-serif font-bold text-lg text-brand-textDark">${m.nombre}</h3>
+                                <p class="text-xs text-brand-textMuted">${m.especie} &bull; ${m.zona_barrio}</p>
+                            </div>
+                            <div class="pt-2 border-t border-brand-tagBg flex flex-col gap-2">
+                                <button onclick="cambiarEstadoMascotaUser('${m.id}', 'RESUELTA')" class="w-full py-2 bg-brand-tagBg hover:bg-brand-greenBadge hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-check mr-1.5"></i> Marcar como Resuelta / Adoptada
+                                </button>
+                                ${m.estado === "ACTIVA" ? `
+                                    <button onclick="cambiarEstadoMascotaUser('${m.id}', 'PAUSADA')" class="w-full py-1.5 bg-transparent hover:bg-brand-tagBg rounded-pill text-[11px] font-semibold text-brand-textMuted transition-colors">
+                                        Pausar publicación temporalmente
+                                    </button>
+                                ` : `
+                                    <button onclick="cambiarEstadoMascotaUser('${m.id}', 'ACTIVA')" class="w-full py-1.5 bg-transparent hover:bg-brand-tagBg rounded-pill text-[11px] font-semibold text-brand-primary transition-colors">
+                                        Reanudar publicación activa
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `).join("");
+                }
+
+                // Render Resueltas
+                if (resueltas.length === 0) {
+                    contResueltas.innerHTML = `
+                        <div class="col-span-full bg-brand-card rounded-card p-8 border border-brand-tagBg text-center text-sm text-brand-textMuted">
+                            Aún no tenés casos marcados como resueltos.
+                        </div>
+                    `;
+                } else {
+                    contResueltas.innerHTML = resueltas.map(m => `
+                        <div class="bg-brand-card rounded-card p-4 border border-brand-tagBg flex flex-col justify-between space-y-3 opacity-90">
+                            <div>
+                                <div class="relative h-40 rounded-card overflow-hidden mb-2 border border-brand-tagBg">
+                                    <img src="${m.foto_url}" class="w-full h-full object-cover grayscale" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600'">
+                                    <span class="absolute top-2 right-2 px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white bg-brand-greenBadge">RESUELTA</span>
+                                </div>
+                                <h3 class="font-serif font-bold text-lg text-brand-textDark">${m.nombre}</h3>
+                                <p class="text-xs text-brand-textMuted">${m.tipo_publicacion} &bull; ${m.zona_barrio}</p>
+                            </div>
+                            <div class="pt-2 border-t border-brand-tagBg">
+                                <button onclick="cambiarEstadoMascotaUser('${m.id}', 'ACTIVA')" class="w-full py-2 bg-brand-tagBg hover:bg-brand-primary hover:text-white rounded-pill text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-rotate-left mr-1.5"></i> Volver a publicar como activa
+                                </button>
+                            </div>
+                        </div>
+                    `).join("");
+                }
+            } catch (err) {
+                contActivas.innerHTML = `<p class="col-span-full text-sm text-red-600">${err.message}</p>`;
+                contResueltas.innerHTML = `<p class="col-span-full text-sm text-red-600">${err.message}</p>`;
+            }
+        }
+
+        function renderInsigniaUsuario() {
+            const ins = document.getElementById("user-insignia");
+            if (!currentUser) return;
+
+            if (currentUser.rol === "ADMIN_MUNICIPAL") {
+                ins.className = "px-3 py-1 rounded-pill bg-brand-greenBadge text-white text-[11px] font-bold uppercase inline-flex items-center gap-1.5";
+                ins.innerHTML = `<i class="fa-solid fa-building-columns"></i> Gestión Oficial Zoonosis`;
+                ins.classList.remove("hidden");
+            } else if (currentUser.rol === "REFUGIO" || currentUser.rol === "CIUDADANO") {
+                ins.classList.remove("hidden");
+                if (currentUser.verificado_municipio) {
+                    ins.className = "px-3 py-1 rounded-pill bg-brand-greenBadge text-white text-[11px] font-bold uppercase inline-flex items-center gap-1.5";
+                    ins.innerHTML = `<i class="fa-solid fa-certificate"></i> Con Respaldo Municipal (${currentUser.partido})`;
+                } else {
+                    ins.className = "px-3 py-1 rounded-pill bg-brand-tagBg text-brand-textMuted text-[11px] font-bold uppercase inline-flex items-center gap-1.5";
+                    ins.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Cuenta Independiente (${currentUser.partido})`;
+                }
+            }
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            currentUser = requireAuth();
+            if (!currentUser) return;
+            renderNavbar("dashboard");
+
+            // Información superior
+            document.getElementById("user-badge-role").textContent = `${currentUser.rol} • ${currentUser.partido}`;
+            document.getElementById("user-welcome").textContent = `Hola, ${currentUser.nombre}`;
+            document.getElementById("user-partido-subtitle").textContent = `Panel de administración y control &bull; Partido de ${currentUser.partido}, Buenos Aires`;
+
+            renderInsigniaUsuario();
+
+            if (currentUser.rol === "ADMIN_MUNICIPAL") {
+                // Configurar vista Admin
+                document.getElementById("view-admin-municipal").classList.remove("hidden");
+                document.getElementById("fields-mascota-admin").innerHTML = getMascotaFormHTML("ma");
+
+                // Cargar métricas y primera pestaña
+                cargarMetricasPartido();
+                cargarAnimalesPartidoAdmin();
+
+                // Manejo de formulario de campaña
+                document.getElementById("form-admin-campana").onsubmit = async (e) => {
+                    e.preventDefault();
+                    try {
+                        await apiFetch("/campanas", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                titulo: document.getElementById("ac-titulo").value.trim(),
+                                tipo: document.getElementById("ac-tipo").value,
+                                fecha_inicio: document.getElementById("ac-inicio").value,
+                                fecha_fin: document.getElementById("ac-fin").value,
+                                horario: document.getElementById("ac-horario").value.trim(),
+                                ubicacion: document.getElementById("ac-ubicacion").value.trim(),
+                                requisitos: document.getElementById("ac-req").value.trim()
+                            })
+                        });
+                        e.target.reset();
+                        alert("Campaña oficial publicada con éxito en el partido.");
+                        cargarCampanasAdmin();
+                        cargarMetricasPartido();
+                    } catch (err) {
+                        alert("Error al publicar campaña: " + err.message);
+                    }
+                };
+
+                // Manejo de formulario de mascota (Admin)
+                document.getElementById("form-mascota-admin").onsubmit = async (e) => {
+                    e.preventDefault();
+                    try {
+                        const data = extractMascotaFormData("ma");
+                        data.partido = currentUser.partido;
+                        await apiFetch("/mascotas", {
+                            method: "POST",
+                            body: JSON.stringify(data)
+                        });
+                        e.target.reset();
+                        alert("Publicación oficial registrada con éxito.");
+                        cambiarPestanaAdmin("animales");
+                        cargarMetricasPartido();
+                    } catch (err) {
+                        alert("Error al publicar mascota: " + err.message);
+                    }
+                };
+            } else {
+                // Configurar vista Refugio / Ciudadano
+                document.getElementById("view-user-standard").classList.remove("hidden");
+                document.getElementById("fields-mascota-user").innerHTML = getMascotaFormHTML("mu");
+
+                cargarMisPublicacionesUser();
+
+                // Manejo de formulario de mascota (Refugio / Ciudadano)
+                document.getElementById("form-mascota-user").onsubmit = async (e) => {
+                    e.preventDefault();
+                    try {
+                        const data = extractMascotaFormData("mu");
+                        await apiFetch("/mascotas", {
+                            method: "POST",
+                            body: JSON.stringify(data)
+                        });
+                        e.target.reset();
+                        alert("Mascota publicada con éxito.");
+                        cargarMisPublicacionesUser();
+                    } catch (err) {
+                        alert("Error al crear publicación: " + err.message);
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html>

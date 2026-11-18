@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso y Registro - Huellitas Cerca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="js/config.js"></script>
+    <script>tailwind.config = TAILWIND_BRAND_CONFIG;</script>
+</head>
+<body class="bg-brand-bg text-brand-textDark font-sans min-h-screen">
+
+    <header id="app-header" class="bg-brand-bg border-b border-brand-tagBg sticky top-0 z-50"></header>
+
+    <main class="max-w-md mx-auto px-4 py-12">
+        <div class="bg-brand-card p-8 rounded-card border border-brand-tagBg space-y-6">
+            <div class="flex bg-brand-bg p-1 rounded-pill border border-brand-tagBg">
+                <button id="tab-login" class="flex-1 py-2 rounded-pill text-xs font-bold bg-brand-card text-brand-primary border border-brand-tagBg">Iniciar Sesión</button>
+                <button id="tab-register" class="flex-1 py-2 rounded-pill text-xs font-bold text-brand-textMuted">Crear Cuenta</button>
+            </div>
+
+            <!-- FORM LOGIN -->
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Correo Electrónico</label>
+                    <input type="email" id="login-email" required placeholder="refugio@tandil.org" class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Contraseña</label>
+                    <input type="password" id="login-pass" required placeholder="123456" class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-brand-primary hover:bg-brand-textDark text-white rounded-pill text-sm font-semibold">
+                    Ingresar al Panel &rarr;
+                </button>
+                <p class="text-[11px] text-brand-textMuted text-center pt-2">
+                    Demo rápida: <strong>admin@tandil.gob.ar</strong> o <strong>refugio@tandil.org</strong> (Clave: <strong>123456</strong>)
+                </p>
+            </form>
+
+            <!-- FORM REGISTRO -->
+            <form id="form-register" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tipo de Cuenta</label>
+                    <select id="reg-rol" class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                        <option value="REFUGIO">Refugio / Rescatista Independiente</option>
+                        <option value="CIUDADANO">Ciudadano / Particular</option>
+                        <option value="ADMIN_MUNICIPAL">Administrador Municipal (Zoonosis)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Nombre del Refugio / Entidad / Persona</label>
+                    <input type="text" id="reg-nombre" required class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Partido (Buenos Aires)</label>
+                    <select id="reg-partido" class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">WhatsApp de Contacto (con 549)</label>
+                    <input type="text" id="reg-wa" required placeholder="5492494111111" class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Correo Electrónico</label>
+                    <input type="email" id="reg-email" required class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Contraseña</label>
+                    <input type="password" id="reg-pass" required class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill text-sm font-semibold">
+                    Registrarme &rarr;
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            renderNavbar("login");
+            populatePartidosSelect(document.getElementById("reg-partido"));
+
+            const tabLogin = document.getElementById("tab-login");
+            const tabReg = document.getElementById("tab-register");
+            const formLogin = document.getElementById("form-login");
+            const formReg = document.getElementById("form-register");
+
+            tabLogin.onclick = () => {
+                formLogin.classList.remove("hidden");
+                formReg.classList.add("hidden");
+                tabLogin.className = "flex-1 py-2 rounded-pill text-xs font-bold bg-brand-card text-brand-primary border border-brand-tagBg";
+                tabReg.className = "flex-1 py-2 rounded-pill text-xs font-bold text-brand-textMuted";
+            };
+            tabReg.onclick = () => {
+                formReg.classList.remove("hidden");
+                formLogin.classList.add("hidden");
+                tabReg.className = "flex-1 py-2 rounded-pill text-xs font-bold bg-brand-card text-brand-primary border border-brand-tagBg";
+                tabLogin.className = "flex-1 py-2 rounded-pill text-xs font-bold text-brand-textMuted";
+            };
+
+            formLogin.onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await apiFetch("/auth/login", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            email: document.getElementById("login-email").value,
+                            password: document.getElementById("login-pass").value
+                        })
+                    });
+                    saveSession(res);
+                    window.location.href = "dashboard.html";
+                } catch (err) {
+                    alert(err.message);
+                }
+            };
+
+            formReg.onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await apiFetch("/auth/register", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            rol: document.getElementById("reg-rol").value,
+                            nombre: document.getElementById("reg-nombre").value,
+                            partido: document.getElementById("reg-partido").value,
+                            whatsapp: document.getElementById("reg-wa").value,
+                            email: document.getElementById("reg-email").value,
+                            password: document.getElementById("reg-pass").value
+                        })
+                    });
+                    saveSession(res);
+                    window.location.href = "dashboard.html";
+                } catch (err) {
+                    alert(err.message);
+                }
+            };
+        });
+    </script>
+</body>
+</html>
