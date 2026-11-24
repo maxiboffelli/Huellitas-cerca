@@ -14,12 +14,27 @@ async def register(payload: UsuarioRegister):
     if existing:
         raise HTTPException(status_code=400, detail="El correo ya está registrado")
 
+    if payload.rol == "REFUGIO":
+        muni_partido = await municipios_col.find_one({"partido": payload.partido})
+        if muni_partido and not muni_partido.get("licencia_activa", muni_partido.get("estado_licencia", "ACTIVA") == "ACTIVA"):
+            raise HTTPException(
+                status_code=403,
+                detail="Municipio sin licencia activa. No se pueden registrar refugios hasta que habilite su licencia.",
+            )
+
     verificado = False
     municipio_id_str = None
 
     if payload.municipio_id:
-        muni = await municipios_col.find_one({"_id": ObjectId(payload.municipio_id), "estado_licencia": "ACTIVA"})
+        if not ObjectId.is_valid(payload.municipio_id):
+            raise HTTPException(status_code=400, detail="ID de municipio inválido")
+        muni = await municipios_col.find_one({"_id": ObjectId(payload.municipio_id)})
         if muni:
+            if not muni.get("licencia_activa", muni.get("estado_licencia", "ACTIVA") == "ACTIVA"):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Municipio sin licencia activa. No se pueden vincular refugios ni cuentas hasta que habilite su licencia.",
+                )
             municipio_id_str = str(muni["_id"])
             if payload.rol == "ADMIN_MUNICIPAL":
                 verificado = True

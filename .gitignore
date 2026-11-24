@@ -4,3 +4,12 @@ __pycache__/
 *.pyc
 .vscode/
 venv/
+
+.vercel/
+frontend/.env.local
+
+.vercel/
+frontend/.env.local
+
+.vercel/
+frontend/.env.local

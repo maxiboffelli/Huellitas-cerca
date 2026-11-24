@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingreso y Registro - Huellitas Cerca</title>
+    <title>Ingreso y Registro - Código Pescar</title>
+    <link rel="icon" type="image/png" href="assets/logo-pata.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="js/config.js"></script>
@@ -18,6 +19,15 @@
             <div class="flex bg-brand-bg p-1 rounded-pill border border-brand-tagBg">
                 <button id="tab-login" class="flex-1 py-2 rounded-pill text-xs font-bold bg-brand-card text-brand-primary border border-brand-tagBg">Iniciar Sesión</button>
                 <button id="tab-register" class="flex-1 py-2 rounded-pill text-xs font-bold text-brand-textMuted">Crear Cuenta</button>
+            </div>
+
+            <!-- CARTEL LICENCIA INACTIVA -->
+            <div id="banner-sin-licencia" class="hidden bg-red-50 border border-red-300 text-red-800 rounded-card p-4 text-xs font-semibold flex items-start gap-2.5">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-base mt-0.5 shrink-0"></i>
+                <div>
+                    <p class="font-bold uppercase tracking-wider">Municipio sin licencia activa</p>
+                    <p class="font-normal mt-0.5">El municipio seleccionado no cuenta con una licencia activa en este momento. No es posible registrar o vincular un refugio hasta que habilite su licencia.</p>
+                </div>
             </div>
 
             <!-- FORM LOGIN -->
@@ -68,7 +78,7 @@
                     <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Contraseña</label>
                     <input type="password" id="reg-pass" required class="w-full px-4 py-3 bg-white border border-brand-tagBg rounded-pill text-sm">
                 </div>
-                <button type="submit" class="w-full py-3.5 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill text-sm font-semibold">
+                <button type="submit" id="btn-reg-submit" class="w-full py-3.5 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill text-sm font-semibold">
                     Registrarme &rarr;
                 </button>
             </form>
@@ -78,9 +88,41 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
+        async function verificarLicenciaRegistro() {
+            const rol = document.getElementById("reg-rol").value;
+            const partido = document.getElementById("reg-partido").value;
+            const banner = document.getElementById("banner-sin-licencia");
+            const btn = document.getElementById("btn-reg-submit");
+
+            if (rol !== "REFUGIO" || !partido) {
+                banner.classList.add("hidden");
+                btn.disabled = false;
+                btn.classList.remove("opacity-50", "cursor-not-allowed");
+                return;
+            }
+            try {
+                const res = await apiFetch(`/municipios/licencia-estado?partido=${encodeURIComponent(partido)}`);
+                if (!res.licencia_activa) {
+                    banner.classList.remove("hidden");
+                    btn.disabled = true;
+                    btn.classList.add("opacity-50", "cursor-not-allowed");
+                } else {
+                    banner.classList.add("hidden");
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-50", "cursor-not-allowed");
+                }
+            } catch (_) {
+                banner.classList.add("hidden");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             renderNavbar("login");
             populatePartidosSelect(document.getElementById("reg-partido"));
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnTo = urlParams.get("returnTo");
+            const destinoPostAuth = returnTo && returnTo.startsWith(window.location.origin) ? returnTo : (returnTo && !returnTo.startsWith("http") ? returnTo : "dashboard.html");
 
             const tabLogin = document.getElementById("tab-login");
             const tabReg = document.getElementById("tab-register");
@@ -90,6 +132,7 @@
             tabLogin.onclick = () => {
                 formLogin.classList.remove("hidden");
                 formReg.classList.add("hidden");
+                document.getElementById("banner-sin-licencia").classList.add("hidden");
                 tabLogin.className = "flex-1 py-2 rounded-pill text-xs font-bold bg-brand-card text-brand-primary border border-brand-tagBg";
                 tabReg.className = "flex-1 py-2 rounded-pill text-xs font-bold text-brand-textMuted";
             };
@@ -98,7 +141,11 @@
                 formLogin.classList.add("hidden");
                 tabReg.className = "flex-1 py-2 rounded-pill text-xs font-bold bg-brand-card text-brand-primary border border-brand-tagBg";
                 tabLogin.className = "flex-1 py-2 rounded-pill text-xs font-bold text-brand-textMuted";
+                verificarLicenciaRegistro();
             };
+
+            document.getElementById("reg-rol").addEventListener("change", verificarLicenciaRegistro);
+            document.getElementById("reg-partido").addEventListener("change", verificarLicenciaRegistro);
 
             formLogin.onsubmit = async (e) => {
                 e.preventDefault();
@@ -111,7 +158,7 @@
                         })
                     });
                     saveSession(res);
-                    window.location.href = "dashboard.html";
+                    window.location.href = destinoPostAuth;
                 } catch (err) {
                     alert(err.message);
                 }
@@ -132,8 +179,11 @@
                         })
                     });
                     saveSession(res);
-                    window.location.href = "dashboard.html";
+                    window.location.href = destinoPostAuth;
                 } catch (err) {
+                    if (err.message && err.message.toLowerCase().includes("licencia")) {
+                        document.getElementById("banner-sin-licencia").classList.remove("hidden");
+                    }
                     alert(err.message);
                 }
             };

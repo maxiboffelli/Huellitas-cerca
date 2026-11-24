@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campañas Municipales - Huellitas Cerca</title>
+    <title>Campañas Municipales - Código Pescar</title>
+    <link rel="icon" type="image/png" href="assets/logo-pata.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="js/config.js"></script>
@@ -41,20 +42,42 @@
                     grid.innerHTML = `<div class="col-span-full bg-brand-card p-8 rounded-card border border-brand-tagBg text-center text-sm text-brand-textMuted">No hay campañas cargadas para este partido todavía.</div>`;
                     return;
                 }
-                grid.innerHTML = items.map(c => `
-                    <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg space-y-4">
-                        <div class="flex justify-between items-center gap-2">
-                            <span class="px-3 py-1 rounded-pill bg-brand-greenBadge text-white text-[11px] font-bold uppercase">${c.partido}</span>
-                            <span class="text-xs font-bold text-brand-accent">${c.fecha_inicio} al ${c.fecha_fin}</span>
+                grid.innerHTML = items.map(c => {
+                    const turnoHTML = c.requiere_turno
+                        ? `
+                            <div class="bg-brand-greenBadge/10 border border-brand-greenBadge/30 rounded-card px-4 py-3 space-y-1.5">
+                                <p class="text-xs font-bold text-brand-greenBadge uppercase"><i class="fa-solid fa-calendar-check mr-1.5"></i>Requiere Turno Previo</p>
+                                ${c.contacto_turno ? `<p class="text-xs text-brand-textDark"><i class="fa-solid fa-phone mr-1.5 text-brand-textMuted"></i>Contacto: <strong>${c.contacto_turno}</strong></p>` : ""}
+                                ${c.link_turnos ? `<a href="${c.link_turnos}" target="_blank" class="inline-block text-xs font-bold text-brand-accent hover:underline"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Sacar turno online</a>` : ""}
+                            </div>`
+                        : `<div class="bg-brand-tagBg/60 rounded-card px-4 py-2.5">
+                                <p class="text-xs font-semibold text-brand-primary"><i class="fa-solid fa-clock mr-1.5"></i>Por orden de llegada — Sin turno previo</p>
+                           </div>`;
+
+                    const linkOficialHTML = c.link_oficial
+                        ? `<a href="${c.link_oficial}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-primary hover:text-brand-accent">
+                              <i class="fa-solid fa-globe"></i> Sitio oficial del operativo
+                           </a>`
+                        : "";
+
+                    return `
+                        <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg space-y-4">
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="px-3 py-1 rounded-pill bg-brand-greenBadge text-white text-[11px] font-bold uppercase">${c.partido}</span>
+                                <span class="text-xs font-bold text-brand-accent">${c.fecha_inicio} al ${c.fecha_fin}</span>
+                            </div>
+                            <h2 class="font-serif font-bold text-2xl text-brand-textDark">${c.titulo}</h2>
+                            <div class="space-y-1.5 text-sm text-brand-textMuted">
+                                <p><strong class="text-brand-textDark">Tipo:</strong> ${c.tipo.replace("_", " y ")}</p>
+                                <p><strong class="text-brand-textDark">Lugar:</strong> ${c.ubicacion}</p>
+                                <p><strong class="text-brand-textDark">Horario:</strong> ${c.horario}</p>
+                                <p><strong class="text-brand-textDark">Requisitos:</strong> ${c.requisitos}</p>
+                            </div>
+                            ${turnoHTML}
+                            ${linkOficialHTML}
                         </div>
-                        <h2 class="font-serif font-bold text-2xl text-brand-textDark">${c.titulo}</h2>
-                        <div class="space-y-1.5 text-sm text-brand-textMuted">
-                            <p><strong class="text-brand-textDark">Lugar:</strong> ${c.ubicacion}</p>
-                            <p><strong class="text-brand-textDark">Horario:</strong> ${c.horario}</p>
-                            <p><strong class="text-brand-textDark">Requisitos:</strong> ${c.requisitos}</p>
-                        </div>
-                    </div>
-                `).join("");
+                    `;
+                }).join("");
             } catch (err) {
                 grid.innerHTML = `<p class="text-sm text-red-600">Error: ${err.message}</p>`;
             }

@@ -3,8 +3,9 @@ const isLocal = !window.location.hostname || window.location.hostname === "local
 const API_BASE = isLocal ? "http://127.0.0.1:8000" : PROD_API_URL.replace(/\/$/, "");
 
 const CONFIG = {
-    APP_NAME: "Huellitas Cerca",
-    SUBTITLE: "GESTIÓN MUNICIPAL Y RED DE REFUGIOS",
+    APP_NAME: "Código Pescar",
+    APP_SUBTITLE_LONG: "Refugios & Vos",
+    SUBTITLE: "REFUGIOS & VOS — GESTIÓN MUNICIPAL",
     API_BASE_URL: `${API_BASE}/api`,
     PARTIDOS_BUENOS_AIRES: [
         "Tandil",

@@ -16,6 +16,7 @@ class MunicipioCreate(BaseModel):
     whatsapp_institucional: str
     logo_url: Optional[str] = None
     estado_licencia: Literal["ACTIVA", "SUSPENDIDA"] = "ACTIVA"
+    licencia_activa: bool = True
     metricas: MetricasMunicipio = Field(default_factory=MetricasMunicipio)
 
 
@@ -52,7 +53,26 @@ class MascotaCreate(BaseModel):
     zona_barrio: str
     descripcion: str
     foto_url: str
+    gancho: Optional[str] = None
+    convivencia: Optional[str] = None
     salud: SaludMascota = Field(default_factory=SaludMascota)
+    whatsapp_contacto: Optional[str] = None
+
+
+class MascotaUpdate(BaseModel):
+    tipo_publicacion: Optional[Literal["ADOPCION", "PERDIDO", "ENCONTRADO"]] = None
+    nombre: Optional[str] = None
+    especie: Optional[Literal["PERRO", "GATO"]] = None
+    sexo: Optional[Literal["MACHO", "HEMBRA"]] = None
+    tamano: Optional[Literal["PEQUENO", "MEDIANO", "GRANDE"]] = None
+    edad: Optional[Literal["CACHORRO", "ADULTO", "SENIOR"]] = None
+    partido: Optional[str] = None
+    zona_barrio: Optional[str] = None
+    descripcion: Optional[str] = None
+    gancho: Optional[str] = None
+    convivencia: Optional[str] = None
+    foto_url: Optional[str] = None
+    salud: Optional[SaludMascota] = None
     whatsapp_contacto: Optional[str] = None
 
 
@@ -70,6 +90,8 @@ class CampanaCreate(BaseModel):
     ubicacion: str
     requisitos: str
     requiere_turno: bool = False
+    contacto_turno: Optional[str] = None
+    link_oficial: Optional[str] = None
     link_turnos: Optional[str] = None
     activa: bool = True
 

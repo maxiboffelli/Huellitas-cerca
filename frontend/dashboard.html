@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Gestión - Huellitas Cerca</title>
+    <title>Panel de Gestión - Código Pescar</title>
+    <link rel="icon" type="image/png" href="assets/logo-pata.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="js/config.js"></script>
@@ -27,6 +28,17 @@
             <button onclick="logout()" class="px-5 py-2.5 bg-brand-tagBg hover:bg-brand-accent hover:text-white rounded-pill text-xs font-bold transition-colors">
                 <i class="fa-solid fa-right-from-bracket mr-1.5"></i> Cerrar Sesión
             </button>
+        </div>
+
+        <!-- CARTEL GLOBAL: MUNICIPIO SIN LICENCIA ACTIVA -->
+        <div id="banner-municipio-sin-licencia" class="hidden bg-red-50 border border-red-300 text-red-900 rounded-card p-5 flex items-start gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-red-600 text-xl mt-0.5 shrink-0"></i>
+            <div class="space-y-1">
+                <h2 class="font-bold text-sm uppercase tracking-wider">Municipio sin licencia activa</h2>
+                <p class="text-xs leading-relaxed">
+                    El municipio de <strong id="sin-licencia-partido"></strong> no posee una licencia activa en este momento. La publicación de mascotas y la vinculación/verificación de refugios se encuentran bloqueadas hasta que el municipio active su licencia.
+                </p>
+            </div>
         </div>
 
         <!-- ========================================== -->
@@ -92,7 +104,6 @@
                         <h2 class="font-serif font-bold text-2xl text-brand-textDark">Animales Publicados en el Partido</h2>
                         <p class="text-xs text-brand-textMuted mt-1">Supervisión integral de animales en adopción y reportes vecinales del municipio.</p>
                     </div>
-                    <!-- Filtro por estado para el admin -->
                     <div class="flex items-center gap-2 bg-brand-card p-1.5 rounded-pill border border-brand-tagBg text-xs">
                         <span class="text-brand-textMuted px-2 font-bold uppercase text-[10px]">Filtrar:</span>
                         <button onclick="filtrarAnimalesAdmin('ACTIVA')" id="filtro-estado-ACTIVA" class="px-3 py-1 rounded-pill font-bold bg-brand-accent text-white">Activas</button>
@@ -148,15 +159,43 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Horario de Atención</label>
-                                <input type="text" id="ac-horario" required placeholder="Ej: 08:30 a 13:00 hs (por orden de llegada)" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <input type="text" id="ac-horario" required placeholder="Ej: 08:30 a 13:00 hs" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Ubicación / Punto Móvil</label>
                                 <input type="text" id="ac-ubicacion" required placeholder="Ej: Plaza Moreno (Av. 13 y 50)" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
                             </div>
                             <div>
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Sitio / Lugar Oficial (URL opcional)</label>
+                                <input type="url" id="ac-link-oficial" placeholder="https://municipio.gob.ar/zoonosis" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            </div>
+
+                            <!-- MODALIDAD DE ATENCIÓN: SOLO CON TURNOS vs ORDEN DE LLEGADA -->
+                            <div class="bg-white p-3.5 rounded-card border border-brand-tagBg space-y-2.5">
+                                <label class="block text-xs font-bold text-brand-textMuted uppercase">Modalidad de Atención</label>
+                                <label class="flex items-center gap-2.5 text-xs font-semibold text-brand-textDark cursor-pointer">
+                                    <input type="checkbox" id="ac-requiere-turno" onchange="toggleCamposTurnoCampana()" class="rounded">
+                                    <span>Solo con turnos (desmarcar si es por orden de llegada)</span>
+                                </label>
+                                <p id="ac-modalidad-hint" class="text-[11px] text-brand-primary font-medium">
+                                    <i class="fa-solid fa-clock mr-1"></i> Modalidad actual: Por orden de llegada
+                                </p>
+
+                                <div id="ac-campos-turno" class="hidden space-y-2 pt-2 border-t border-brand-tagBg">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-brand-textMuted uppercase mb-1">Correo o WhatsApp para sacar turno *</label>
+                                        <input type="text" id="ac-contacto-turno" placeholder="Ej: zoonosis@municipio.gob.ar o 54911..." class="w-full px-3.5 py-2 bg-brand-bg border border-brand-tagBg rounded-pill text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-brand-textMuted uppercase mb-1">Link de turnos online (opcional)</label>
+                                        <input type="url" id="ac-link-turnos" placeholder="https://turnos.municipio.gob.ar" class="w-full px-3.5 py-2 bg-brand-bg border border-brand-tagBg rounded-pill text-xs">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
                                 <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Requisitos para Vecinos</label>
-                                <textarea id="ac-req" rows="2" required placeholder="Ej: Ayuno de 12 hs agua y comida, perros con correa y bozal, gatos en bolsa de red/transportadora..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
+                                <textarea id="ac-req" rows="2" required placeholder="Ej: Ayuno de 12 hs agua y comida, perros con correa y bozal, gatos en transportadora..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
                             </div>
                             <button type="submit" class="w-full py-3 bg-brand-greenBadge hover:bg-brand-greenBadge/90 text-white rounded-pill font-bold transition-colors">
                                 Publicar Campaña Municipal &rarr;
@@ -184,9 +223,8 @@
                         <p class="text-xs text-brand-textMuted mt-1">Esta publicación contará automáticamente con el sello de verificación municipal.</p>
                     </div>
                     <form id="form-mascota-admin" class="space-y-4 text-sm">
-                        <!-- Componente reutilizable de formulario -->
                         <div id="fields-mascota-admin"></div>
-                        <button type="submit" class="w-full py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
+                        <button type="submit" id="btn-submit-mascota-admin" class="w-full py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
                             Publicar Animal con Sello Municipal &rarr;
                         </button>
                     </form>
@@ -207,7 +245,7 @@
                     </div>
                     <form id="form-mascota-user" class="space-y-3.5 text-sm">
                         <div id="fields-mascota-user"></div>
-                        <button type="submit" class="w-full py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
+                        <button type="submit" id="btn-submit-mascota-user" class="w-full py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
                             Publicar Ahora &rarr;
                         </button>
                     </form>
@@ -228,14 +266,58 @@
                     </div>
                 </div>
 
-                <!-- CONTENEDOR PUBLICACIONES ACTIVAS -->
                 <div id="lista-user-activas" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-
-                <!-- CONTENEDOR PUBLICACIONES RESUELTAS -->
                 <div id="lista-user-resueltas" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
             </section>
         </div>
     </main>
+
+    <!-- ========================================== -->
+    <!-- MODAL: EDITAR MASCOTA COMPLETA             -->
+    <!-- ========================================== -->
+    <div id="modal-editar-mascota" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)cerrarModalEditar()">
+        <div class="bg-brand-card rounded-card border border-brand-tagBg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5">
+            <div class="flex justify-between items-center pb-3 border-b border-brand-tagBg">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-brand-accent">Edición Completa</span>
+                    <h3 class="font-serif font-bold text-xl text-brand-textDark">Editar Ficha del Animal</h3>
+                </div>
+                <button onclick="cerrarModalEditar()" class="w-8 h-8 rounded-full bg-brand-tagBg hover:bg-brand-accent hover:text-white flex items-center justify-center text-brand-textMuted text-lg">&times;</button>
+            </div>
+            <form id="form-editar-mascota" class="space-y-4 text-sm">
+                <input type="hidden" id="edit-mascota-id">
+                <div id="fields-mascota-edit"></div>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <button type="submit" class="flex-1 py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill font-bold transition-colors">
+                        Guardar Cambios &rarr;
+                    </button>
+                    <button type="button" onclick="cerrarModalEditar()" class="px-6 py-3 bg-brand-tagBg text-brand-textDark rounded-pill font-bold">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: RECORDATORIOS WHATSAPP (OPCIÓN A)   -->
+    <!-- ========================================== -->
+    <div id="modal-recordatorios" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)cerrarModalRecordatorios()">
+        <div class="bg-brand-card rounded-card border border-brand-tagBg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5">
+            <div class="flex justify-between items-start pb-3 border-b border-brand-tagBg">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-brand-greenBadge">Recordatorio Semi-Automático (Opción A)</span>
+                    <h3 id="rec-campana-titulo" class="font-serif font-bold text-xl text-brand-textDark mt-0.5"></h3>
+                    <p id="rec-campana-info" class="text-xs text-brand-textMuted mt-0.5"></p>
+                </div>
+                <button onclick="cerrarModalRecordatorios()" class="w-8 h-8 rounded-full bg-brand-tagBg hover:bg-brand-accent hover:text-white flex items-center justify-center text-brand-textMuted text-lg">&times;</button>
+            </div>
+
+            <div id="rec-mensaje-preview" class="bg-brand-bg rounded-card p-3.5 border border-brand-tagBg text-xs text-brand-textDark italic"></div>
+
+            <div id="rec-lista-vecinos" class="space-y-2.5 max-h-80 overflow-y-auto"></div>
+        </div>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
@@ -243,9 +325,168 @@
         let currentUser = null;
         let adminEstadoFiltro = "ACTIVA";
         let subtabUserActiva = "activas";
+        let adminMascotasCache = [];
         let misPublicacionesCache = [];
+        let licenciaMunicipioActiva = true;
 
-        // Plantilla de inputs del formulario de mascota para no duplicar código
+        // ==========================================
+        // COMPONENTE DE SUBIDA + ACOMODO EN CANVAS
+        // ==========================================
+        const croppers = {};
+
+        function initPhotoCropper(prefix, initialUrl = "") {
+            const canvas = document.getElementById(`${prefix}-canvas`);
+            const fileInput = document.getElementById(`${prefix}-foto-file`);
+            const zoomInput = document.getElementById(`${prefix}-zoom`);
+            const resetBtn = document.getElementById(`${prefix}-reset-crop`);
+            if (!canvas) return;
+
+            const state = {
+                img: null,
+                zoom: 1,
+                offsetX: 0,
+                offsetY: 0,
+                dragging: false,
+                lastX: 0,
+                lastY: 0,
+                hasNewImage: false,
+                initialUrl: initialUrl || ""
+            };
+            croppers[prefix] = state;
+
+            const ctx = canvas.getContext("2d");
+
+            function draw() {
+                ctx.fillStyle = "#E8E4D9";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (!state.img) {
+                    ctx.fillStyle = "#7A7A6E";
+                    ctx.font = "13px sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.fillText("Seleccioná una foto para encuadrarla acá", canvas.width / 2, canvas.height / 2);
+                    return;
+                }
+
+                const img = state.img;
+                const baseScale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                const scale = baseScale * state.zoom;
+                const drawW = img.width * scale;
+                const drawH = img.height * scale;
+
+                const maxOffX = Math.max(0, (drawW - canvas.width) / 2);
+                const maxOffY = Math.max(0, (drawH - canvas.height) / 2);
+                state.offsetX = Math.max(-maxOffX, Math.min(maxOffX, state.offsetX));
+                state.offsetY = Math.max(-maxOffY, Math.min(maxOffY, state.offsetY));
+
+                const x = (canvas.width - drawW) / 2 + state.offsetX;
+                const y = (canvas.height - drawH) / 2 + state.offsetY;
+                ctx.drawImage(img, x, y, drawW, drawH);
+            }
+
+            state.loadUrl = (url) => {
+                if (!url) { state.img = null; draw(); return; }
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => {
+                    state.img = img;
+                    state.zoom = 1;
+                    state.offsetX = 0;
+                    state.offsetY = 0;
+                    if (zoomInput) zoomInput.value = "1";
+                    draw();
+                };
+                img.onerror = () => {
+                    state.img = null;
+                    draw();
+                };
+                img.src = url;
+            };
+
+            if (initialUrl) {
+                state.loadUrl(initialUrl);
+            } else {
+                draw();
+            }
+
+            fileInput.onchange = (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        state.img = img;
+                        state.zoom = 1;
+                        state.offsetX = 0;
+                        state.offsetY = 0;
+                        state.hasNewImage = true;
+                        if (zoomInput) zoomInput.value = "1";
+                        draw();
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            zoomInput.oninput = (e) => {
+                state.zoom = parseFloat(e.target.value) || 1;
+                state.hasNewImage = true;
+                draw();
+            };
+
+            resetBtn.onclick = () => {
+                state.zoom = 1;
+                state.offsetX = 0;
+                state.offsetY = 0;
+                if (zoomInput) zoomInput.value = "1";
+                draw();
+            };
+
+            const startDrag = (cx, cy) => {
+                if (!state.img) return;
+                state.dragging = true;
+                state.lastX = cx;
+                state.lastY = cy;
+            };
+            const moveDrag = (cx, cy) => {
+                if (!state.dragging) return;
+                state.offsetX += cx - state.lastX;
+                state.offsetY += cy - state.lastY;
+                state.lastX = cx;
+                state.lastY = cy;
+                state.hasNewImage = true;
+                draw();
+            };
+            const endDrag = () => { state.dragging = false; };
+
+            canvas.onmousedown = (e) => startDrag(e.clientX, e.clientY);
+            window.addEventListener("mousemove", (e) => moveDrag(e.clientX, e.clientY));
+            window.addEventListener("mouseup", endDrag);
+
+            canvas.ontouchstart = (e) => { if (e.touches[0]) startDrag(e.touches[0].clientX, e.touches[0].clientY); };
+            canvas.ontouchmove = (e) => { if (e.touches[0]) { e.preventDefault(); moveDrag(e.touches[0].clientX, e.touches[0].clientY); } };
+            canvas.ontouchend = endDrag;
+        }
+
+        function getCroppedPhotoDataUrl(prefix, isEdit = false) {
+            const state = croppers[prefix];
+            const canvas = document.getElementById(`${prefix}-canvas`);
+            if (!state || !state.img) {
+                if (isEdit && state?.initialUrl) return state.initialUrl;
+                return null;
+            }
+            if (isEdit && !state.hasNewImage && state.initialUrl) {
+                return state.initialUrl;
+            }
+            try {
+                return canvas.toDataURL("image/jpeg", 0.78);
+            } catch (_) {
+                return state.initialUrl || null;
+            }
+        }
+
+        // Plantilla reutilizable de inputs del formulario de mascota
         function getMascotaFormHTML(prefix) {
             return `
                 <div class="space-y-3">
@@ -309,14 +550,32 @@
                         <input type="text" id="${prefix}-whatsapp" placeholder="Ej: 5491122334455" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">URL de la Foto</label>
-                        <input type="url" id="${prefix}-foto" required placeholder="https://images.unsplash.com/..." class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    <!-- SUBIDA DE FOTO DESDE ARCHIVO Y ACOMODO EN CANVAS -->
+                    <div class="bg-white p-3.5 rounded-card border border-brand-tagBg space-y-2.5">
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase">Foto del Animal (Archivo + Acomodo)</label>
+                        <input type="file" id="${prefix}-foto-file" accept="image/*" class="w-full text-xs text-brand-textMuted file:mr-3 file:py-1.5 file:px-4 file:rounded-pill file:border-0 file:text-xs file:font-bold file:bg-brand-tagBg file:text-brand-textDark hover:file:bg-brand-accent hover:file:text-white cursor-pointer">
+                        <canvas id="${prefix}-canvas" width="400" height="280" class="w-full rounded-card border border-brand-tagBg cursor-move touch-none"></canvas>
+                        <div class="flex items-center gap-3 text-xs">
+                            <span class="text-brand-textMuted font-semibold shrink-0"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i>Zoom</span>
+                            <input type="range" id="${prefix}-zoom" min="1" max="3" step="0.05" value="1" class="flex-1 accent-brand-accent">
+                            <button type="button" id="${prefix}-reset-crop" class="px-3 py-1 rounded-pill bg-brand-tagBg text-[11px] font-bold hover:bg-brand-primary hover:text-white">Centrar</button>
+                        </div>
+                        <p class="text-[11px] text-brand-textMuted">Arrastrá la imagen sobre el recuadro para acomodarla. Se comprimirá automáticamente al guardar.</p>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Descripción y Carácter</label>
-                        <textarea id="${prefix}-desc" rows="3" required placeholder="Contá su historia, temperamento con otros animales, cuidados especiales..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Gancho Breve (opcional)</label>
+                        <input type="text" id="${prefix}-gancho" placeholder="Ej: Súper compañero, ideal para departamento" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Convivencia (opcional)</label>
+                        <input type="text" id="${prefix}-convivencia" placeholder="Ej: Se lleva bien con perros, gatos y niños" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Perfil del animal</label>
+                        <textarea id="${prefix}-desc" rows="3" required placeholder="Contá su historia, carácter, rutina y cuidados especiales..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
                     </div>
 
                     <div>
@@ -332,7 +591,11 @@
             `;
         }
 
-        function extractMascotaFormData(prefix) {
+        function extractMascotaFormData(prefix, isEdit = false) {
+            const fotoData = getCroppedPhotoDataUrl(prefix, isEdit);
+            if (!fotoData) {
+                throw new Error("Por favor seleccioná una foto del animal desde tu dispositivo.");
+            }
             return {
                 tipo_publicacion: document.getElementById(`${prefix}-tipo`).value,
                 nombre: document.getElementById(`${prefix}-nombre`).value.trim(),
@@ -342,7 +605,9 @@
                 edad: document.getElementById(`${prefix}-edad`).value,
                 zona_barrio: document.getElementById(`${prefix}-zona`).value.trim(),
                 whatsapp_contacto: document.getElementById(`${prefix}-whatsapp`).value.trim() || undefined,
-                foto_url: document.getElementById(`${prefix}-foto`).value.trim(),
+                foto_url: fotoData,
+                gancho: document.getElementById(`${prefix}-gancho`).value.trim(),
+                convivencia: document.getElementById(`${prefix}-convivencia`).value.trim(),
                 descripcion: document.getElementById(`${prefix}-desc`).value.trim(),
                 salud: {
                     vacunado: document.getElementById(`${prefix}-vac`).checked,
@@ -354,8 +619,86 @@
         }
 
         // ==========================================
+        // VERIFICACIÓN DE LICENCIA MUNICIPAL
+        // ==========================================
+        function mostrarBannerSinLicencia() {
+            licenciaMunicipioActiva = false;
+            document.getElementById("sin-licencia-partido").textContent = currentUser.partido;
+            document.getElementById("banner-municipio-sin-licencia").classList.remove("hidden");
+
+            ["btn-submit-mascota-admin", "btn-submit-mascota-user"].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add("opacity-50", "cursor-not-allowed");
+                    btn.textContent = "Municipio sin licencia activa";
+                }
+            });
+        }
+
+        async function verificarLicenciaActual() {
+            try {
+                const res = await apiFetch(`/municipios/licencia-estado?partido=${encodeURIComponent(currentUser.partido)}`);
+                if (!res.licencia_activa) {
+                    mostrarBannerSinLicencia();
+                }
+            } catch (_) {}
+        }
+
+        // ==========================================
+        // MODAL DE EDICIÓN COMPLETA
+        // ==========================================
+        function abrirModalEditar(id) {
+            const m = [...adminMascotasCache, ...misPublicacionesCache].find(item => item.id === id);
+            if (!m) return;
+
+            document.getElementById("edit-mascota-id").value = m.id;
+            document.getElementById("fields-mascota-edit").innerHTML = getMascotaFormHTML("me");
+
+            document.getElementById("me-tipo").value = m.tipo_publicacion || "ADOPCION";
+            document.getElementById("me-nombre").value = m.nombre || "";
+            document.getElementById("me-especie").value = m.especie || "PERRO";
+            document.getElementById("me-sexo").value = m.sexo || "MACHO";
+            document.getElementById("me-tamano").value = m.tamano || "MEDIANO";
+            document.getElementById("me-edad").value = m.edad || "ADULTO";
+            document.getElementById("me-zona").value = m.zona_barrio || "";
+            document.getElementById("me-whatsapp").value = m.whatsapp_contacto || "";
+            document.getElementById("me-gancho").value = m.gancho || "";
+            document.getElementById("me-convivencia").value = m.convivencia || "";
+            document.getElementById("me-desc").value = m.descripcion || "";
+            document.getElementById("me-vac").checked = Boolean(m.salud?.vacunado);
+            document.getElementById("me-rab").checked = Boolean(m.salud?.antirrabica);
+            document.getElementById("me-est").checked = Boolean(m.salud?.esterilizado);
+            document.getElementById("me-des").checked = Boolean(m.salud?.desparasitado);
+
+            initPhotoCropper("me", m.foto_url || "");
+            document.getElementById("modal-editar-mascota").classList.remove("hidden");
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById("modal-editar-mascota").classList.add("hidden");
+        }
+
+        // ==========================================
         // FUNCIONES ADMIN MUNICIPAL
         // ==========================================
+        function toggleCamposTurnoCampana() {
+            const checked = document.getElementById("ac-requiere-turno").checked;
+            const campos = document.getElementById("ac-campos-turno");
+            const contactoInput = document.getElementById("ac-contacto-turno");
+            const hint = document.getElementById("ac-modalidad-hint");
+
+            if (checked) {
+                campos.classList.remove("hidden");
+                contactoInput.required = true;
+                hint.innerHTML = `<i class="fa-solid fa-calendar-check mr-1 text-brand-greenBadge"></i> Modalidad actual: <strong>Solo con turnos</strong>`;
+            } else {
+                campos.classList.add("hidden");
+                contactoInput.required = false;
+                hint.innerHTML = `<i class="fa-solid fa-clock mr-1"></i> Modalidad actual: Por orden de llegada`;
+            }
+        }
+
         function cambiarPestanaAdmin(tab) {
             const tabs = ["animales", "refugios", "campanas", "nueva"];
             tabs.forEach(t => {
@@ -418,6 +761,8 @@
 
             try {
                 const items = await apiFetch(`/mascotas?partido=${encodeURIComponent(currentUser.partido)}&estado=${adminEstadoFiltro}`);
+                adminMascotasCache = items;
+
                 if (items.length === 0) {
                     grid.innerHTML = `
                         <div class="col-span-full bg-brand-card p-8 rounded-card border border-brand-tagBg text-center text-sm text-brand-textMuted">
@@ -448,6 +793,9 @@
                         </div>
 
                         <div class="pt-2 border-t border-brand-tagBg flex flex-col gap-2">
+                            <button onclick="abrirModalEditar('${m.id}')" class="w-full py-2 bg-white border border-brand-tagBg hover:border-brand-primary rounded-pill text-xs font-bold transition-colors">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> Editar Ficha Completa
+                            </button>
                             ${m.estado === "ACTIVA" ? `
                                 <div class="grid grid-cols-2 gap-2">
                                     <button onclick="cambiarEstadoMascotaAdmin('${m.id}', 'RESUELTA')" class="py-2 bg-brand-tagBg hover:bg-brand-greenBadge hover:text-white rounded-pill text-xs font-bold transition-colors">
@@ -530,7 +878,7 @@
                                 </p>
                             ` : ""}
                             <p class="text-[11px] text-brand-textMuted pt-1">
-                                Sede: <strong>${r.partido}</strong> &bull; Rol en plataforma: <strong>${r.rol}</strong>
+                                Sede: <strong>${r.partido}</strong> &bull; Rol: <strong>${r.rol}</strong>
                             </p>
                         </div>
 
@@ -559,6 +907,9 @@
                 cargarRefugiosPartidoAdmin();
                 cargarMetricasPartido();
             } catch (err) {
+                if (err.message && err.message.toLowerCase().includes("licencia")) {
+                    mostrarBannerSinLicencia();
+                }
                 alert("Error al actualizar verificación: " + err.message);
             }
         }
@@ -582,30 +933,43 @@
                 }
 
                 list.innerHTML = items.map(c => `
-                    <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div class="space-y-1.5 flex-1">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${
-                                    c.activa ? 'bg-brand-greenBadge' : 'bg-brand-textMuted'
-                                }">${c.activa ? 'OPERATIVO ACTIVO' : 'FINALIZADA'}</span>
-                                <span class="text-xs font-bold text-brand-accent">${c.tipo}</span>
-                            </div>
-                            <h4 class="font-serif font-bold text-lg text-brand-textDark">${c.titulo}</h4>
-                            <div class="text-xs text-brand-textMuted space-y-0.5">
-                                <p><i class="fa-solid fa-calendar mr-1"></i> ${c.fecha_inicio} al ${c.fecha_fin} &bull; <i class="fa-solid fa-clock ml-2 mr-1"></i> ${c.horario}</p>
-                                <p><i class="fa-solid fa-location-dot mr-1"></i> ${c.ubicacion}</p>
-                                <p><i class="fa-solid fa-clipboard-list mr-1"></i> ${c.requisitos}</p>
+                    <div class="bg-brand-card rounded-card p-5 border border-brand-tagBg space-y-3">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div class="space-y-1 flex-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${
+                                        c.activa ? 'bg-brand-greenBadge' : 'bg-brand-textMuted'
+                                    }">${c.activa ? 'OPERATIVO ACTIVO' : 'FINALIZADA'}</span>
+                                    <span class="text-xs font-bold text-brand-accent">${c.tipo}</span>
+                                    <span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold ${
+                                        c.requiere_turno ? 'bg-brand-accent/15 text-brand-accent' : 'bg-brand-tagBg text-brand-primary'
+                                    }">${c.requiere_turno ? 'Solo con turnos' : 'Orden de llegada'}</span>
+                                </div>
+                                <h4 class="font-serif font-bold text-lg text-brand-textDark">${c.titulo}</h4>
+                                <div class="text-xs text-brand-textMuted space-y-0.5">
+                                    <p><i class="fa-solid fa-calendar mr-1"></i> ${c.fecha_inicio} al ${c.fecha_fin} &bull; <i class="fa-solid fa-clock ml-2 mr-1"></i> ${c.horario}</p>
+                                    <p><i class="fa-solid fa-location-dot mr-1"></i> ${c.ubicacion}</p>
+                                    ${c.requiere_turno && c.contacto_turno ? `<p class="text-brand-textDark"><i class="fa-solid fa-phone mr-1"></i> Turnos: <strong>${c.contacto_turno}</strong></p>` : ""}
+                                    ${c.link_oficial ? `<p><a href="${c.link_oficial}" target="_blank" class="text-brand-primary font-bold hover:underline"><i class="fa-solid fa-globe mr-1"></i> Sitio oficial del operativo</a></p>` : ""}
+                                </div>
                             </div>
                         </div>
 
-                        <button onclick="alternarEstadoCampana('${c.id}')" class="px-4 py-2 rounded-pill text-xs font-bold transition-colors shrink-0 ${
-                            c.activa
-                                ? 'bg-brand-tagBg text-brand-textDark hover:bg-brand-accent hover:text-white'
-                                : 'bg-brand-greenBadge text-white hover:bg-brand-greenBadge/90'
-                        }">
-                            <i class="fa-solid ${c.activa ? 'fa-flag-checkered' : 'fa-play'} mr-1.5"></i>
-                            ${c.activa ? 'Finalizar Operativo' : 'Reactivar Campaña'}
-                        </button>
+                        <div class="pt-3 border-t border-brand-tagBg flex flex-wrap gap-2">
+                            ${c.activa ? `
+                                <button onclick="abrirModalRecordatorios('${c.id}')" class="px-4 py-2 rounded-pill text-xs font-bold bg-brand-greenBadge text-white hover:bg-brand-greenBadge/90 transition-colors">
+                                    <i class="fa-brands fa-whatsapp mr-1.5"></i> Recordar a Vecinos por WhatsApp
+                                </button>
+                            ` : ""}
+                            <button onclick="alternarEstadoCampana('${c.id}')" class="px-4 py-2 rounded-pill text-xs font-bold transition-colors ${
+                                c.activa
+                                    ? 'bg-brand-tagBg text-brand-textDark hover:bg-brand-accent hover:text-white'
+                                    : 'bg-brand-primary text-white hover:bg-brand-textDark'
+                            }">
+                                <i class="fa-solid ${c.activa ? 'fa-flag-checkered' : 'fa-play'} mr-1.5"></i>
+                                ${c.activa ? 'Finalizar Operativo' : 'Reactivar Campaña'}
+                            </button>
+                        </div>
                     </div>
                 `).join("");
             } catch (err) {
@@ -615,14 +979,62 @@
 
         async function alternarEstadoCampana(campanaId) {
             try {
-                await apiFetch(`/campanas/${campanaId}/estado`, {
-                    method: "PATCH"
-                });
+                await apiFetch(`/campanas/${campanaId}/estado`, { method: "PATCH" });
                 cargarCampanasAdmin();
                 cargarMetricasPartido();
             } catch (err) {
                 alert("Error al cambiar estado de la campaña: " + err.message);
             }
+        }
+
+        async function abrirModalRecordatorios(campanaId) {
+            const modal = document.getElementById("modal-recordatorios");
+            const lista = document.getElementById("rec-lista-vecinos");
+            lista.innerHTML = `<p class="text-xs text-brand-textMuted">Cargando vecinos del partido...</p>`;
+            modal.classList.remove("hidden");
+
+            try {
+                const data = await apiFetch(`/campanas/${campanaId}/vecinos`);
+                const c = data.campana;
+                document.getElementById("rec-campana-titulo").textContent = c.titulo;
+                document.getElementById("rec-campana-info").textContent = `${c.partido} • ${c.fecha_inicio} al ${c.fecha_fin} (${c.horario}) • ${c.ubicacion}`;
+
+                const modalidad = c.requiere_turno
+                    ? `Solo con turno previo (${c.contacto_turno || c.link_turnos || "consultar en Zoonosis"}).`
+                    : `Atención por orden de llegada.`;
+
+                const construirMensaje = (nombreVecino) =>
+                    `¡Hola ${nombreVecino}! Desde Zoonosis de ${c.partido} (${CONFIG.APP_NAME}) te recordamos la campaña oficial: *${c.titulo}*.\n📅 Fechas: ${c.fecha_inicio} al ${c.fecha_fin} (${c.horario})\n📍 Lugar: ${c.ubicacion}\nℹ️ ${modalidad}`;
+
+                document.getElementById("rec-mensaje-preview").textContent = `Vista previa del mensaje: "${construirMensaje("[Nombre del Vecino]")}"`;
+
+                if (!data.vecinos || data.vecinos.length === 0) {
+                    lista.innerHTML = `<p class="text-xs text-brand-textMuted text-center py-4">No hay vecinos registrados con WhatsApp en ${c.partido} todavía.</p>`;
+                    return;
+                }
+
+                lista.innerHTML = data.vecinos.map(v => {
+                    const wa = (v.whatsapp || "").replace(/\D/g, "");
+                    const url = `https://wa.me/${wa}?text=${encodeURIComponent(construirMensaje(v.nombre))}`;
+                    return `
+                        <div class="bg-brand-bg rounded-card p-3.5 border border-brand-tagBg flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="font-bold text-sm text-brand-textDark">${v.nombre}</p>
+                                <p class="text-[11px] text-brand-textMuted">${v.rol} &bull; WhatsApp: ${v.whatsapp}</p>
+                            </div>
+                            <a href="${url}" target="_blank" class="px-4 py-2 bg-brand-greenBadge hover:bg-brand-greenBadge/90 text-white rounded-pill text-xs font-bold inline-flex items-center gap-1.5 transition-colors">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Enviar recordatorio por WhatsApp
+                            </a>
+                        </div>
+                    `;
+                }).join("");
+            } catch (err) {
+                lista.innerHTML = `<p class="text-xs text-red-600">${err.message}</p>`;
+            }
+        }
+
+        function cerrarModalRecordatorios() {
+            document.getElementById("modal-recordatorios").classList.add("hidden");
         }
 
         // ==========================================
@@ -673,7 +1085,6 @@
                 const items = await apiFetch("/mascotas/mis-publicaciones");
                 misPublicacionesCache = items;
 
-                // Si alguna publicación tiene verificado_municipio actualizado, sincronizar sesión
                 if (items.length > 0 && typeof items[0].verificado_municipio === "boolean") {
                     if (currentUser.verificado_municipio !== items[0].verificado_municipio) {
                         currentUser.verificado_municipio = items[0].verificado_municipio;
@@ -688,7 +1099,6 @@
                 countActivas.textContent = activas.length;
                 countResueltas.textContent = resueltas.length;
 
-                // Render Activas
                 if (activas.length === 0) {
                     contActivas.innerHTML = `
                         <div class="col-span-full bg-brand-card rounded-card p-8 border border-brand-tagBg text-center text-sm text-brand-textMuted">
@@ -708,6 +1118,9 @@
                                 <p class="text-xs text-brand-textMuted">${m.especie} &bull; ${m.zona_barrio}</p>
                             </div>
                             <div class="pt-2 border-t border-brand-tagBg flex flex-col gap-2">
+                                <button onclick="abrirModalEditar('${m.id}')" class="w-full py-2 bg-white border border-brand-tagBg hover:border-brand-primary rounded-pill text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-pen-to-square mr-1"></i> Editar Ficha
+                                </button>
                                 <button onclick="cambiarEstadoMascotaUser('${m.id}', 'RESUELTA')" class="w-full py-2 bg-brand-tagBg hover:bg-brand-greenBadge hover:text-white rounded-pill text-xs font-bold transition-colors">
                                     <i class="fa-solid fa-check mr-1.5"></i> Marcar como Resuelta / Adoptada
                                 </button>
@@ -725,7 +1138,6 @@
                     `).join("");
                 }
 
-                // Render Resueltas
                 if (resueltas.length === 0) {
                     contResueltas.innerHTML = `
                         <div class="col-span-full bg-brand-card rounded-card p-8 border border-brand-tagBg text-center text-sm text-brand-textMuted">
@@ -743,7 +1155,10 @@
                                 <h3 class="font-serif font-bold text-lg text-brand-textDark">${m.nombre}</h3>
                                 <p class="text-xs text-brand-textMuted">${m.tipo_publicacion} &bull; ${m.zona_barrio}</p>
                             </div>
-                            <div class="pt-2 border-t border-brand-tagBg">
+                            <div class="pt-2 border-t border-brand-tagBg flex flex-col gap-2">
+                                <button onclick="abrirModalEditar('${m.id}')" class="w-full py-2 bg-white border border-brand-tagBg hover:border-brand-primary rounded-pill text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-pen-to-square mr-1"></i> Editar Ficha
+                                </button>
                                 <button onclick="cambiarEstadoMascotaUser('${m.id}', 'ACTIVA')" class="w-full py-2 bg-brand-tagBg hover:bg-brand-primary hover:text-white rounded-pill text-xs font-bold transition-colors">
                                     <i class="fa-solid fa-rotate-left mr-1.5"></i> Volver a publicar como activa
                                 </button>
@@ -785,25 +1200,51 @@
             if (!currentUser) return;
             renderNavbar("dashboard");
 
-            // Información superior
             document.getElementById("user-badge-role").textContent = `${currentUser.rol} • ${currentUser.partido}`;
             document.getElementById("user-welcome").textContent = `Hola, ${currentUser.nombre}`;
-            document.getElementById("user-partido-subtitle").textContent = `Panel de administración y control &bull; Partido de ${currentUser.partido}, Buenos Aires`;
+            document.getElementById("user-partido-subtitle").textContent = `Panel de administración y control • Partido de ${currentUser.partido}, Buenos Aires`;
 
             renderInsigniaUsuario();
+            verificarLicenciaActual();
+
+            // Guardar edición completa de mascota
+            document.getElementById("form-editar-mascota").onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById("edit-mascota-id").value;
+                try {
+                    const data = extractMascotaFormData("me", true);
+                    await apiFetch(`/mascotas/${id}`, {
+                        method: "PATCH",
+                        body: JSON.stringify(data)
+                    });
+                    cerrarModalEditar();
+                    alert("Ficha actualizada con éxito.");
+                    if (currentUser.rol === "ADMIN_MUNICIPAL") {
+                        cargarAnimalesPartidoAdmin();
+                    } else {
+                        cargarMisPublicacionesUser();
+                    }
+                } catch (err) {
+                    alert("Error al actualizar ficha: " + err.message);
+                }
+            };
 
             if (currentUser.rol === "ADMIN_MUNICIPAL") {
-                // Configurar vista Admin
                 document.getElementById("view-admin-municipal").classList.remove("hidden");
                 document.getElementById("fields-mascota-admin").innerHTML = getMascotaFormHTML("ma");
+                initPhotoCropper("ma");
 
-                // Cargar métricas y primera pestaña
                 cargarMetricasPartido();
                 cargarAnimalesPartidoAdmin();
 
-                // Manejo de formulario de campaña
                 document.getElementById("form-admin-campana").onsubmit = async (e) => {
                     e.preventDefault();
+                    const reqTurno = document.getElementById("ac-requiere-turno").checked;
+                    const contactoTurno = document.getElementById("ac-contacto-turno").value.trim();
+                    if (reqTurno && !contactoTurno) {
+                        alert("Ingresá un correo o WhatsApp de contacto para sacar turno.");
+                        return;
+                    }
                     try {
                         await apiFetch("/campanas", {
                             method: "POST",
@@ -814,10 +1255,15 @@
                                 fecha_fin: document.getElementById("ac-fin").value,
                                 horario: document.getElementById("ac-horario").value.trim(),
                                 ubicacion: document.getElementById("ac-ubicacion").value.trim(),
+                                link_oficial: document.getElementById("ac-link-oficial").value.trim() || null,
+                                requiere_turno: reqTurno,
+                                contacto_turno: reqTurno ? contactoTurno : null,
+                                link_turnos: reqTurno ? (document.getElementById("ac-link-turnos").value.trim() || null) : null,
                                 requisitos: document.getElementById("ac-req").value.trim()
                             })
                         });
                         e.target.reset();
+                        toggleCamposTurnoCampana();
                         alert("Campaña oficial publicada con éxito en el partido.");
                         cargarCampanasAdmin();
                         cargarMetricasPartido();
@@ -826,7 +1272,6 @@
                     }
                 };
 
-                // Manejo de formulario de mascota (Admin)
                 document.getElementById("form-mascota-admin").onsubmit = async (e) => {
                     e.preventDefault();
                     try {
@@ -837,21 +1282,24 @@
                             body: JSON.stringify(data)
                         });
                         e.target.reset();
+                        initPhotoCropper("ma");
                         alert("Publicación oficial registrada con éxito.");
                         cambiarPestanaAdmin("animales");
                         cargarMetricasPartido();
                     } catch (err) {
+                        if (err.message && err.message.toLowerCase().includes("licencia")) {
+                            mostrarBannerSinLicencia();
+                        }
                         alert("Error al publicar mascota: " + err.message);
                     }
                 };
             } else {
-                // Configurar vista Refugio / Ciudadano
                 document.getElementById("view-user-standard").classList.remove("hidden");
                 document.getElementById("fields-mascota-user").innerHTML = getMascotaFormHTML("mu");
+                initPhotoCropper("mu");
 
                 cargarMisPublicacionesUser();
 
-                // Manejo de formulario de mascota (Refugio / Ciudadano)
                 document.getElementById("form-mascota-user").onsubmit = async (e) => {
                     e.preventDefault();
                     try {
@@ -861,9 +1309,13 @@
                             body: JSON.stringify(data)
                         });
                         e.target.reset();
+                        initPhotoCropper("mu");
                         alert("Mascota publicada con éxito.");
                         cargarMisPublicacionesUser();
                     } catch (err) {
+                        if (err.message && err.message.toLowerCase().includes("licencia")) {
+                            mostrarBannerSinLicencia();
+                        }
                         alert("Error al crear publicación: " + err.message);
                     }
                 };

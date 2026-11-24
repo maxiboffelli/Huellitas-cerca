@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from bson import ObjectId
-from database import campanas_col
+from database import campanas_col, usuarios_col
 from models import CampanaCreate
 from auth_utils import require_admin_municipal
 
@@ -31,6 +31,44 @@ async def mis_campanas(
 ):
     cursor = campanas_col.find({"partido": admin_user["partido"]}).sort("fecha_inicio", -1)
     return [serialize_campana(doc) async for doc in cursor]
+
+
+@router.get("/{campana_id}/vecinos")
+async def vecinos_para_recordatorio(
+    campana_id: str,
+    admin_user: dict = Depends(require_admin_municipal),
+):
+    """Lista vecinos del partido para enviar recordatorio por WhatsApp."""
+    if not ObjectId.is_valid(campana_id):
+        raise HTTPException(status_code=400, detail="ID inválido")
+
+    campana = await campanas_col.find_one({"_id": ObjectId(campana_id)})
+    if not campana:
+        raise HTTPException(status_code=404, detail="Campaña no encontrada")
+    if campana.get("partido") != admin_user.get("partido"):
+        raise HTTPException(status_code=403, detail="No tienes permisos sobre esta campaña")
+
+    cursor = usuarios_col.find(
+        {"partido": admin_user["partido"], "whatsapp": {"$exists": True, "$ne": ""}},
+        {"password_hash": 0}
+    ).sort("nombre", 1)
+
+    vecinos = []
+    async for doc in cursor:
+        doc["id"] = str(doc.pop("_id"))
+        doc.pop("password_hash", None)
+        vecinos.append({
+            "id": doc["id"],
+            "nombre": doc.get("nombre", ""),
+            "whatsapp": doc.get("whatsapp", ""),
+            "rol": doc.get("rol", "CIUDADANO"),
+        })
+
+    return {
+        "campana": serialize_campana(campana),
+        "vecinos": vecinos,
+        "total": len(vecinos),
+    }
 
 
 @router.post("", status_code=201)

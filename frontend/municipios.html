@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Municipios Adheridos - Huellitas Cerca</title>
+    <title>Municipios Adheridos - Código Pescar</title>
+    <link rel="icon" type="image/png" href="assets/logo-pata.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="js/config.js"></script>
@@ -15,7 +16,7 @@
 
     <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
         <div class="bg-brand-card rounded-card p-8 border border-brand-tagBg">
-            <span class="text-xs font-bold tracking-widest text-brand-accent uppercase">Licencias SaaS B2B</span>
+            <span class="text-xs font-bold tracking-widest text-brand-accent uppercase">Licencias SaaS B2G</span>
             <h1 class="text-3xl font-serif font-bold text-brand-textDark mt-1">Municipalidades de Buenos Aires Adheridas</h1>
             <p class="text-sm text-brand-textMuted mt-2 max-w-3xl">
                 Gobiernos locales que utilizan nuestra plataforma para centralizar el control de zoonosis, transparencia en adopciones y gestión de animales en la vía pública.
@@ -23,20 +24,84 @@
         </div>
 
         <div id="grid-municipios" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+        <!-- CTA: SUMATE A NUESTRA RED -->
+        <div class="bg-brand-card rounded-card p-8 md:p-10 border border-brand-greenBadge grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div class="md:col-span-8 space-y-4">
+                <span class="inline-block px-4 py-1.5 rounded-pill bg-brand-greenBadge text-white text-xs font-bold tracking-widest uppercase">
+                    <i class="fa-solid fa-handshake mr-1.5"></i> Para Municipalidades
+                </span>
+                <h2 class="text-2xl md:text-3xl font-serif font-bold text-brand-textDark">
+                    Sumate a nuestra red de municipios
+                </h2>
+                <p class="text-sm text-brand-textMuted leading-relaxed">
+                    Implementá <strong class="text-brand-textDark">Código Pescar</strong> en tu partido y gestioná adopciones, animales perdidos y campañas de zoonosis de forma digital, centralizada y transparente.
+                </p>
+                <ul class="text-sm text-brand-textDark space-y-2">
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-greenBadge mt-0.5 shrink-0"></i> Panel exclusivo de Administración para el área de Zoonosis</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-greenBadge mt-0.5 shrink-0"></i> Red de refugios vinculados al municipio con sello oficial</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-greenBadge mt-0.5 shrink-0"></i> Campañas de vacunación/castración con recordatorios por WhatsApp</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-check text-brand-greenBadge mt-0.5 shrink-0"></i> Métricas de impacto: adopciones logradas, castaciones y más</li>
+                    <li class="flex items-start gap-2"><i class="fa-solid fa-star text-brand-accent mt-0.5 shrink-0"></i> <strong>1 mes de prueba gratis</strong> para municipios que se sumen ahora</li>
+                </ul>
+            </div>
+            <div class="md:col-span-4 flex flex-col gap-3">
+                <!-- Formulario de interés / CTA de activación -->
+                <div class="bg-brand-bg rounded-card p-5 border border-brand-tagBg space-y-3">
+                    <h3 class="font-serif font-bold text-lg text-brand-textDark">¡Quiero activar mi municipio!</h3>
+                    <p class="text-xs text-brand-textMuted">Completá tus datos y te contactamos para activar la prueba gratuita.</p>
+                    <form id="form-interes-municipio" class="space-y-2.5 text-sm" onsubmit="enviarInteres(event)">
+                        <input type="text" id="interes-municipio" required placeholder="Nombre del Municipio / Partido"
+                            class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm">
+                        <input type="text" id="interes-nombre" required placeholder="Tu nombre y cargo"
+                            class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm">
+                        <input type="text" id="interes-wa" required placeholder="WhatsApp (con 549...)"
+                            class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm">
+                        <button type="submit"
+                            class="w-full py-3 bg-brand-greenBadge hover:bg-brand-greenBadge/90 text-white rounded-pill text-sm font-bold transition-colors">
+                            Solicitar mes de prueba gratis &rarr;
+                        </button>
+                    </form>
+                    <div id="form-interes-ok" class="hidden text-center py-4 space-y-2">
+                        <i class="fa-solid fa-circle-check text-brand-greenBadge text-3xl"></i>
+                        <p class="text-sm font-semibold text-brand-greenBadge">¡Gracias! Te contactamos a la brevedad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="js/api.js"></script>
     <script>
+        function enviarInteres(e) {
+            e.preventDefault();
+            const municipio = document.getElementById("interes-municipio").value.trim();
+            const nombre = document.getElementById("interes-nombre").value.trim();
+            const wa = document.getElementById("interes-wa").value.trim();
+
+            // Armar mensaje WhatsApp para el equipo (semi-automático)
+            const waAdmin = "5491100000000"; // Reemplazar con WA de ventas/activaciones
+            const msg = `Hola! Soy ${nombre} del municipio de ${municipio}. Quisiera conocer más sobre la prueba gratuita de ${CONFIG.APP_NAME}. Mi WhatsApp es ${wa}.`;
+            window.open(`https://wa.me/${waAdmin}?text=${encodeURIComponent(msg)}`, "_blank");
+
+            document.getElementById("form-interes-municipio").classList.add("hidden");
+            document.getElementById("form-interes-ok").classList.remove("hidden");
+        }
+
         document.addEventListener("DOMContentLoaded", async () => {
             renderNavbar("municipios");
             const grid = document.getElementById("grid-municipios");
             try {
                 const munis = await apiFetch("/municipios");
+                if (munis.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full bg-brand-card p-8 rounded-card border border-brand-tagBg text-center text-sm text-brand-textMuted">No hay municipios adheridos aún.</div>`;
+                    return;
+                }
                 grid.innerHTML = munis.map(m => `
                     <div class="bg-brand-card rounded-card p-6 border border-brand-tagBg space-y-4">
                         <div class="flex justify-between items-start">
                             <div>
-                                <span class="px-3 py-1 rounded-pill bg-brand-greenBadge text-white text-[10px] font-bold uppercase">Licencia SaaS Activa</span>
+                                <span class="px-3 py-1 rounded-pill bg-brand-greenBadge text-white text-[10px] font-bold uppercase">Licencia Activa</span>
                                 <h2 class="font-serif font-bold text-2xl text-brand-textDark mt-2">${m.nombre}</h2>
                                 <p class="text-xs font-semibold text-brand-primary">${m.area_responsable}</p>
                             </div>
@@ -56,7 +121,7 @@
                                 Ver animales de ${m.partido} &rarr;
                             </a>
                             <a href="https://wa.me/${m.whatsapp_institucional}" target="_blank" class="px-5 py-2.5 border border-brand-tagBg text-brand-textDark rounded-pill text-xs font-semibold">
-                                WhatsApp Zoonosis
+                                <i class="fa-brands fa-whatsapp mr-1 text-green-600"></i> WhatsApp Zoonosis
                             </a>
                         </div>
                     </div>
