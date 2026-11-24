@@ -40,18 +40,27 @@ class SaludMascota(BaseModel):
     antirrabica: bool = False
     esterilizado: bool = False
     desparasitado: bool = False
+    tiene_vacunas_vigentes: bool = False
+    cartilla_vacunacion_url: Optional[str] = None
+    fecha_desparasitacion: Optional[str] = None
+    esterilizacion_detalle: Optional[str] = None
+    vacunas_incluidas: list[str] = Field(default_factory=list)
 
 
 class MascotaCreate(BaseModel):
     tipo_publicacion: Literal["ADOPCION", "PERDIDO", "ENCONTRADO"] = "ADOPCION"
+    estado_adopcion: Optional[str] = "en adopción"
     nombre: str
     especie: Literal["PERRO", "GATO"]
     sexo: Literal["MACHO", "HEMBRA"]
     tamano: Literal["PEQUENO", "MEDIANO", "GRANDE"]
-    edad: Literal["CACHORRO", "ADULTO", "SENIOR"]
+    edad: str
+    edad_detalle: Optional[str] = None
     partido: Optional[str] = None
     zona_barrio: str
     descripcion: str
+    caracter: Optional[str] = Field(None, max_length=100)
+    socializacion: Optional[str] = None
     foto_url: str
     gancho: Optional[str] = None
     convivencia: Optional[str] = None
@@ -61,14 +70,19 @@ class MascotaCreate(BaseModel):
 
 class MascotaUpdate(BaseModel):
     tipo_publicacion: Optional[Literal["ADOPCION", "PERDIDO", "ENCONTRADO"]] = None
+    estado_adopcion: Optional[str] = None
+    estado: Optional[Literal["ACTIVA", "RESUELTA", "PAUSADA"]] = None
     nombre: Optional[str] = None
     especie: Optional[Literal["PERRO", "GATO"]] = None
     sexo: Optional[Literal["MACHO", "HEMBRA"]] = None
     tamano: Optional[Literal["PEQUENO", "MEDIANO", "GRANDE"]] = None
-    edad: Optional[Literal["CACHORRO", "ADULTO", "SENIOR"]] = None
+    edad: Optional[str] = None
+    edad_detalle: Optional[str] = None
     partido: Optional[str] = None
     zona_barrio: Optional[str] = None
     descripcion: Optional[str] = None
+    caracter: Optional[str] = Field(None, max_length=100)
+    socializacion: Optional[str] = None
     gancho: Optional[str] = None
     convivencia: Optional[str] = None
     foto_url: Optional[str] = None

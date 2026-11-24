@@ -17,20 +17,20 @@
     <main class="max-w-7xl mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- FILTROS -->
-            <aside class="lg:col-span-3 bg-brand-card p-6 rounded-card border border-brand-tagBg h-fit space-y-5">
+            <aside class="lg:col-span-3 bg-brand-card p-6 rounded-card border border-brand-tagBg h-fit space-y-4">
                 <div class="flex items-center justify-between pb-3 border-b border-brand-tagBg">
                     <h2 class="font-bold text-sm uppercase tracking-wider text-brand-primary">Filtros de Búsqueda</h2>
                     <button id="btn-limpiar" class="text-xs font-semibold text-brand-accent hover:underline">Limpiar</button>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-2">Partido / Localidad</label>
-                    <select id="filtro-partido" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm"></select>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Partido / Localidad</label>
+                    <select id="filtro-partido" class="w-full px-4 py-2 bg-white border border-brand-tagBg rounded-pill text-sm"></select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-2">Tipo de Caso</label>
-                    <select id="filtro-tipo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm">
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Tipo de Caso</label>
+                    <select id="filtro-tipo" class="w-full px-4 py-2 bg-white border border-brand-tagBg rounded-pill text-sm">
                         <option value="">Todos (Adopción y Perdidos)</option>
                         <option value="ADOPCION">En Adopción</option>
                         <option value="PERDIDO">Perdidos</option>
@@ -39,25 +39,89 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-2">Especie</label>
-                    <select id="filtro-especie" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm">
-                        <option value="">Perros y Gatos</option>
-                        <option value="PERRO">Perros</option>
-                        <option value="GATO">Gatos</option>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Estado</label>
+                    <select id="filtro-estado-adopcion" class="w-full px-4 py-2 bg-white border border-brand-tagBg rounded-pill text-sm">
+                        <option value="">Activos (Adopción / Tránsito)</option>
+                        <option value="en adopción">En adopción</option>
+                        <option value="en tránsito">En tránsito</option>
+                        <option value="adoptado">Adoptado</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Especie</label>
+                        <select id="filtro-especie" class="w-full px-3 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                            <option value="">Todas</option>
+                            <option value="PERRO">Perro</option>
+                            <option value="GATO">Gato</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Sexo</label>
+                        <select id="filtro-sexo" class="w-full px-3 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                            <option value="">Todos</option>
+                            <option value="MACHO">Macho</option>
+                            <option value="HEMBRA">Hembra</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Edad</label>
+                        <select id="filtro-edad" class="w-full px-3 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                            <option value="">Todas</option>
+                            <option value="CACHORRO">Cachorro</option>
+                            <option value="JOVEN">Joven</option>
+                            <option value="ADULTO">Adulto</option>
+                            <option value="MAYOR">Mayor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Tamaño</label>
+                        <select id="filtro-tamano" class="w-full px-3 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                            <option value="">Todos</option>
+                            <option value="PEQUENO">Pequeño</option>
+                            <option value="MEDIANO">Mediano</option>
+                            <option value="GRANDE">Grande</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Socialización</label>
+                    <select id="filtro-socializacion" class="w-full px-3 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                        <option value="">Cualquier nivel</option>
+                        <option value="Es muy sociable (Convive bien con perros, gatos y convive con niños)">Muy sociable (perros, gatos, niños)</option>
+                        <option value="Es sociable (Convive bien con perros y gatos)">Sociable (perros y gatos)</option>
+                        <option value="Es sociable (Convive con gatos)">Sociable (con gatos)</option>
+                        <option value="Es sociable (Convive con perros y niños)">Sociable (perros y niños)</option>
+                        <option value="Es dominante (Convive sólo con algunos animales y puede convivir con niños)">Dominante (selectivo)</option>
+                        <option value="Es miedoso (Reacciona por miedo, no convive con niños)">Miedoso (sin niños)</option>
+                        <option value="Debe ser único (es reactivo, no convive con niños)">Debe ser único</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-2">Tamaño</label>
-                    <select id="filtro-tamano" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill text-sm">
-                        <option value="">Todos</option>
-                        <option value="PEQUENO">Pequeño</option>
-                        <option value="MEDIANO">Mediano</option>
-                        <option value="GRANDE">Grande</option>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Carácter</label>
+                    <input type="text" id="filtro-caracter" placeholder="Ej: juguetón, tranquilo..." class="w-full px-4 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Vacunas</label>
+                    <select id="filtro-vacunas" class="w-full px-3 py-2 bg-white border border-brand-tagBg rounded-pill text-xs">
+                        <option value="">Todas</option>
+                        <option value="CARTILLA">Con cartilla cargada</option>
+                        <option value="VIGENTES">Vacunas vigentes</option>
+                        <option value="Antirrábica">Antirrábica</option>
+                        <option value="Séxtuple / Quíntuple">Séxtuple / Quíntuple</option>
+                        <option value="Triple Felina">Triple Felina</option>
+                        <option value="Tos de las perreras">Tos de las perreras</option>
                     </select>
                 </div>
 
-                <label class="flex items-center gap-2 text-xs font-semibold text-brand-textDark cursor-pointer pt-2">
+                <label class="flex items-center gap-2 text-xs font-semibold text-brand-textDark cursor-pointer pt-1">
                     <input type="checkbox" id="filtro-verificados" class="rounded">
                     Solo respaldados por Municipio
                 </label>
@@ -80,7 +144,6 @@
     <!-- ============================================ -->
     <div id="modal-ficha" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onclick="if(event.target===this)cerrarModal()">
         <div class="bg-brand-card rounded-card border border-brand-tagBg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <!-- Header del modal -->
             <div class="flex justify-between items-start p-6 pb-0">
                 <div class="space-y-1">
                     <div id="modal-badges" class="flex flex-wrap gap-1.5 mb-2"></div>
@@ -90,15 +153,13 @@
                 <button onclick="cerrarModal()" class="ml-4 w-8 h-8 rounded-full bg-brand-tagBg hover:bg-brand-accent hover:text-white flex items-center justify-center text-brand-textMuted transition-colors shrink-0 text-lg">&times;</button>
             </div>
 
-            <!-- Imagen -->
             <div class="px-6 pt-4">
                 <img id="modal-img" src="" alt="" class="w-full h-64 object-cover rounded-card border border-brand-tagBg">
             </div>
 
-            <!-- Info rápida -->
             <div class="px-6 pt-4 grid grid-cols-3 gap-3">
-                <div id="modal-info-especie" class="bg-brand-bg rounded-card p-3 text-center border border-brand-tagBg">
-                    <span class="block text-xs text-brand-textMuted uppercase font-bold">Especie</span>
+                <div class="bg-brand-bg rounded-card p-3 text-center border border-brand-tagBg">
+                    <span class="block text-xs text-brand-textMuted uppercase font-bold">Especie / Género</span>
                     <span id="modal-especie" class="font-serif font-bold text-brand-textDark text-sm mt-0.5 block"></span>
                 </div>
                 <div class="bg-brand-bg rounded-card p-3 text-center border border-brand-tagBg">
@@ -111,28 +172,26 @@
                 </div>
             </div>
 
-            <!-- Perfil del animal -->
             <div class="px-6 pt-4 space-y-4">
                 <div>
                     <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1.5">Perfil del animal</h4>
+                    <p id="modal-caracter" class="hidden text-xs font-bold text-brand-accent mb-1"></p>
                     <p id="modal-desc" class="text-sm text-brand-textDark leading-relaxed"></p>
                 </div>
 
                 <div id="modal-convivencia-wrap" class="hidden">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1.5">Convivencia</h4>
-                    <p id="modal-convivencia" class="text-sm text-brand-textDark leading-relaxed"></p>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1.5">Socialización y Convivencia</h4>
+                    <p id="modal-convivencia" class="text-sm text-brand-textDark leading-relaxed bg-brand-bg px-3.5 py-2.5 rounded-card border border-brand-tagBg"></p>
                 </div>
 
-                <!-- Estado sanitario -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-2">Estado Sanitario</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-2">Estado Sanitario y Esterilización</h4>
+                    <p id="modal-esterilizacion-detalle" class="text-xs font-semibold text-brand-primary mb-2"></p>
                     <div id="modal-salud" class="grid grid-cols-2 gap-2 text-xs"></div>
                 </div>
             </div>
 
-            <!-- Botones de acción -->
             <div class="px-6 py-5 space-y-2.5">
-                <!-- Botón principal: Quiero Adoptar / Ofrecer Tránsito / Tengo información -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <button id="modal-btn-adoptar" onclick="contactarWA('adoptar')"
                         class="py-3 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill text-sm font-semibold flex justify-center items-center gap-2 transition-colors">
@@ -172,11 +231,11 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
                     <div class="bg-brand-bg rounded-card p-3 border border-brand-tagBg">
-                        <span class="block font-bold uppercase text-brand-textMuted">Especie</span>
+                        <span class="block font-bold uppercase text-brand-textMuted">Especie / Estado</span>
                         <span id="exp-especie" class="font-serif font-bold text-brand-textDark text-sm mt-0.5 block"></span>
                     </div>
                     <div class="bg-brand-bg rounded-card p-3 border border-brand-tagBg">
-                        <span class="block font-bold uppercase text-brand-textMuted">Sexo</span>
+                        <span class="block font-bold uppercase text-brand-textMuted">Género</span>
                         <span id="exp-sexo" class="font-serif font-bold text-brand-textDark text-sm mt-0.5 block"></span>
                     </div>
                     <div class="bg-brand-bg rounded-card p-3 border border-brand-tagBg">
@@ -190,6 +249,14 @@
                 </div>
 
                 <div class="space-y-4">
+                    <div id="exp-caracter-wrap" class="hidden">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1">Carácter en 3 palabras</h4>
+                        <p id="exp-caracter" class="text-sm font-semibold text-brand-accent"></p>
+                    </div>
+                    <div id="exp-convivencia-wrap" class="hidden">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1">Socialización</h4>
+                        <p id="exp-convivencia" class="text-sm text-brand-textDark bg-brand-bg p-3 rounded-card border border-brand-tagBg"></p>
+                    </div>
                     <div>
                         <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1.5">Perfil del animal</h4>
                         <p id="exp-desc" class="text-sm text-brand-textDark leading-relaxed"></p>
@@ -198,20 +265,27 @@
                         <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1.5">Por qué adoptarme</h4>
                         <p id="exp-gancho" class="text-sm italic text-brand-accent leading-relaxed"></p>
                     </div>
-                    <div id="exp-convivencia-wrap" class="hidden">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-1.5">Convivencia</h4>
-                        <p id="exp-convivencia" class="text-sm text-brand-textDark leading-relaxed"></p>
-                    </div>
                 </div>
 
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted mb-2">Estado Sanitario Completo</h4>
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-brand-textMuted">Estado Sanitario Completo</h4>
                     <div id="exp-salud" class="grid grid-cols-2 gap-2 text-xs"></div>
+                    <div class="bg-brand-bg rounded-card p-4 border border-brand-tagBg space-y-1.5 text-xs">
+                        <p><strong class="text-brand-textMuted uppercase">Esterilización:</strong> <span id="exp-esterilizacion" class="font-semibold text-brand-textDark"></span></p>
+                        <p><strong class="text-brand-textMuted uppercase">Última desparasitación interna:</strong> <span id="exp-desparasitacion" class="font-semibold text-brand-textDark"></span></p>
+                        <p id="exp-vacunas-lista-wrap" class="hidden"><strong class="text-brand-textMuted uppercase">Vacunas registradas:</strong> <span id="exp-vacunas-lista" class="font-semibold text-brand-greenBadge"></span></p>
+                    </div>
+
+                    <!-- FOTO DE CARTILLA DE VACUNACIÓN -->
+                    <div id="exp-cartilla-wrap" class="hidden space-y-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-brand-greenBadge"><i class="fa-solid fa-file-medical mr-1.5"></i>Cartilla de Vacunación</h4>
+                        <img id="exp-cartilla-img" src="" alt="Cartilla de vacunación" class="w-full max-h-80 object-contain rounded-card border border-brand-tagBg bg-white">
+                    </div>
                 </div>
 
                 <div class="bg-brand-bg rounded-card p-4 border border-brand-tagBg space-y-1.5 text-sm">
                     <p><strong class="text-brand-textMuted uppercase text-[10px] tracking-wider">Publicado por:</strong> <span id="exp-publicador"></span></p>
-                    <p><strong class="text-brand-textMuted uppercase text-[10px] tracking-wider">Zona:</strong> <span id="exp-zona"></span></p>
+                    <p><strong class="text-brand-textMuted uppercase text-[10px] tracking-wider">Localidad / Zona:</strong> <span id="exp-zona"></span></p>
                     <p><strong class="text-brand-textMuted uppercase text-[10px] tracking-wider">Partido:</strong> <span id="exp-partido"></span></p>
                     <p><strong class="text-brand-textMuted uppercase text-[10px] tracking-wider">Fecha:</strong> <span id="exp-fecha"></span></p>
                 </div>
@@ -267,9 +341,16 @@
             return map[tipo] || tipo;
         }
 
-        function edadLabel(e) {
-            const map = { "CACHORRO": "Cachorro", "ADULTO": "Adulto", "SENIOR": "Senior" };
-            return map[e] || e;
+        function estadoAdopcionLabel(m) {
+            if (m.estado_adopcion) return m.estado_adopcion;
+            if (m.estado === "RESUELTA") return "adoptado";
+            return tipoLabel(m.tipo_publicacion);
+        }
+
+        function edadLabel(e, detalle) {
+            const map = { "CACHORRO": "Cachorro", "JOVEN": "Joven", "ADULTO": "Adulto", "MAYOR": "Mayor", "SENIOR": "Mayor" };
+            const base = map[(e || "").toUpperCase()] || e || "";
+            return detalle ? `${base} (${detalle})` : base;
         }
 
         function tamanoLabel(t) {
@@ -282,10 +363,10 @@
                 <div class="px-3 py-2 rounded-pill border border-brand-tagBg ${ok ? 'bg-brand-greenBadge/15 text-brand-greenBadge font-bold' : 'text-brand-textMuted bg-brand-bg'}">
                     ${ok ? '✓' : '·'} ${label}
                 </div>`;
-            return badge(salud?.vacunado, "Vacunado") +
-                   badge(salud?.antirrabica, "Antirrábica") +
-                   badge(salud?.esterilizado, "Esterilizado") +
-                   badge(salud?.desparasitado, "Desparasitado");
+            return badge(salud?.tiene_vacunas_vigentes || salud?.vacunado, "Vacunas vigentes") +
+                   badge(salud?.antirrabica || (salud?.vacunas_incluidas || []).includes("Antirrábica"), "Antirrábica") +
+                   badge(salud?.esterilizado || salud?.esterilizacion_detalle === "Si, ya está esterilizado", "Esterilizado") +
+                   badge(salud?.desparasitado || Boolean(salud?.fecha_desparasitacion), "Desparasitado");
         }
 
         function abrirFicha(id) {
@@ -293,35 +374,47 @@
             if (!m) return;
             mascotaActual = m;
 
-            const tipoColor = m.tipo_publicacion === "ADOPCION" ? "bg-brand-primary" : m.tipo_publicacion === "PERDIDO" ? "bg-brand-accent" : "bg-brand-primary";
+            const tipoColor = m.tipo_publicacion === "ADOPCION" ? "bg-brand-primary" : "bg-brand-accent";
 
-            // Badges
-            let badgesHTML = `<span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${tipoColor}">${tipoLabel(m.tipo_publicacion)}</span>`;
+            let badgesHTML = `<span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold text-white ${tipoColor} uppercase">${estadoAdopcionLabel(m)}</span>`;
             if (m.verificado_municipio) {
                 badgesHTML += `<span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold bg-brand-greenBadge text-white"><i class="fa-solid fa-certificate mr-1"></i>Municipio</span>`;
             }
-            badgesHTML += `<span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold bg-brand-tagBg text-brand-primary">${m.especie} ${m.sexo === "MACHO" ? "♂" : "♀"}</span>`;
+            if (m.salud?.cartilla_vacunacion_url) {
+                badgesHTML += `<span class="px-2.5 py-0.5 rounded-pill text-[10px] font-bold bg-brand-greenBadge/20 text-brand-greenBadge"><i class="fa-solid fa-file-medical mr-1"></i>Cartilla</span>`;
+            }
             document.getElementById("modal-badges").innerHTML = badgesHTML;
 
             document.getElementById("modal-titulo").textContent = m.nombre;
             document.getElementById("modal-ubicacion").textContent = `📍 ${m.zona_barrio} • ${m.partido}`;
             document.getElementById("modal-img").src = m.foto_url;
             document.getElementById("modal-img").alt = m.nombre;
-            document.getElementById("modal-especie").textContent = m.especie;
-            document.getElementById("modal-edad").textContent = edadLabel(m.edad);
+            document.getElementById("modal-especie").textContent = `${m.especie} ${m.sexo === "MACHO" ? "♂" : "♀"}`;
+            document.getElementById("modal-edad").textContent = edadLabel(m.edad, m.edad_detalle);
             document.getElementById("modal-tamano").textContent = tamanoLabel(m.tamano);
+
+            const carEl = document.getElementById("modal-caracter");
+            if (m.caracter) {
+                carEl.textContent = `Carácter: ${m.caracter}`;
+                carEl.classList.remove("hidden");
+            } else {
+                carEl.classList.add("hidden");
+            }
+
             document.getElementById("modal-desc").textContent = m.descripcion || "Sin descripción disponible.";
             document.getElementById("modal-salud").innerHTML = sanitariosHTML(m.salud);
+            document.getElementById("modal-esterilizacion-detalle").textContent =
+                m.salud?.esterilizacion_detalle || (m.salud?.esterilizado ? "Si, ya está esterilizado" : "Sin especificar estado de esterilización");
 
             const convWrap = document.getElementById("modal-convivencia-wrap");
-            if (m.convivencia) {
-                document.getElementById("modal-convivencia").textContent = m.convivencia;
+            const soc = m.socializacion || m.convivencia;
+            if (soc) {
+                document.getElementById("modal-convivencia").textContent = soc;
                 convWrap.classList.remove("hidden");
             } else {
                 convWrap.classList.add("hidden");
             }
 
-            // Ocultar/mostrar botones según tipo de publicación
             const btnAdoptar = document.getElementById("modal-btn-adoptar");
             const btnTransito = document.getElementById("modal-btn-transito");
             const btnInfo = document.getElementById("modal-btn-info");
@@ -345,12 +438,60 @@
             document.getElementById("exp-titulo").textContent = m.nombre;
             document.getElementById("exp-img").src = m.foto_url;
             document.getElementById("exp-img").alt = m.nombre;
-            document.getElementById("exp-especie").textContent = m.especie;
+            document.getElementById("exp-especie").textContent = `${m.especie} · ${estadoAdopcionLabel(m)}`;
             document.getElementById("exp-sexo").textContent = m.sexo === "MACHO" ? "Macho ♂" : "Hembra ♀";
-            document.getElementById("exp-edad").textContent = edadLabel(m.edad);
+            document.getElementById("exp-edad").textContent = edadLabel(m.edad, m.edad_detalle);
             document.getElementById("exp-tamano").textContent = tamanoLabel(m.tamano);
             document.getElementById("exp-desc").textContent = m.descripcion || "—";
             document.getElementById("exp-salud").innerHTML = sanitariosHTML(m.salud);
+
+            document.getElementById("exp-esterilizacion").textContent =
+                m.salud?.esterilizacion_detalle || (m.salud?.esterilizado ? "Si, ya está esterilizado" : "No informado");
+            document.getElementById("exp-desparasitacion").textContent =
+                m.salud?.fecha_desparasitacion || (m.salud?.desparasitado ? "Al día (sin fecha exacta)" : "No informada");
+
+            const vacWrap = document.getElementById("exp-vacunas-lista-wrap");
+            const vacs = m.salud?.vacunas_incluidas || [];
+            if (vacs.length > 0) {
+                document.getElementById("exp-vacunas-lista").textContent = vacs.join(", ");
+                vacWrap.classList.remove("hidden");
+            } else {
+                vacWrap.classList.add("hidden");
+            }
+
+            const cartillaWrap = document.getElementById("exp-cartilla-wrap");
+            if (m.salud?.cartilla_vacunacion_url) {
+                document.getElementById("exp-cartilla-img").src = m.salud.cartilla_vacunacion_url;
+                cartillaWrap.classList.remove("hidden");
+            } else {
+                cartillaWrap.classList.add("hidden");
+            }
+
+            const carWrap = document.getElementById("exp-caracter-wrap");
+            if (m.caracter) {
+                document.getElementById("exp-caracter").textContent = m.caracter;
+                carWrap.classList.remove("hidden");
+            } else {
+                carWrap.classList.add("hidden");
+            }
+
+            const convWrap = document.getElementById("exp-convivencia-wrap");
+            const soc = m.socializacion || m.convivencia;
+            if (soc) {
+                document.getElementById("exp-convivencia").textContent = soc;
+                convWrap.classList.remove("hidden");
+            } else {
+                convWrap.classList.add("hidden");
+            }
+
+            const ganchoWrap = document.getElementById("exp-gancho-wrap");
+            if (m.gancho) {
+                document.getElementById("exp-gancho").textContent = `"${m.gancho}"`;
+                ganchoWrap.classList.remove("hidden");
+            } else {
+                ganchoWrap.classList.add("hidden");
+            }
+
             document.getElementById("exp-publicador").textContent = `${m.publicador_nombre || "—"} (${m.publicador_rol || "—"})`;
             document.getElementById("exp-zona").textContent = m.zona_barrio || "—";
             document.getElementById("exp-partido").textContent = m.partido || "—";
@@ -362,29 +503,12 @@
                 document.getElementById("exp-fecha").textContent = "—";
             }
 
-            const ganchoWrap = document.getElementById("exp-gancho-wrap");
-            if (m.gancho) {
-                document.getElementById("exp-gancho").textContent = `"${m.gancho}"`;
-                ganchoWrap.classList.remove("hidden");
-            } else {
-                ganchoWrap.classList.add("hidden");
-            }
-
-            const convWrap = document.getElementById("exp-convivencia-wrap");
-            if (m.convivencia) {
-                document.getElementById("exp-convivencia").textContent = m.convivencia;
-                convWrap.classList.remove("hidden");
-            } else {
-                convWrap.classList.add("hidden");
-            }
-
             document.getElementById("modal-expediente").classList.remove("hidden");
         }
 
         function contactarWA(tipo) {
             const user = getCurrentUser ? getCurrentUser() : JSON.parse(localStorage.getItem("hc_user") || "null");
             if (!user) {
-                // Bloquear y pedir login
                 const returnUrl = encodeURIComponent(window.location.href);
                 document.getElementById("btn-ir-login").href = `login.html?returnTo=${returnUrl}`;
                 document.getElementById("modal-login-required").classList.remove("hidden");
@@ -411,14 +535,33 @@
             const params = new URLSearchParams();
             const partido = document.getElementById("filtro-partido").value;
             const tipo = document.getElementById("filtro-tipo").value;
+            const estadoAdopcion = document.getElementById("filtro-estado-adopcion").value;
             const especie = document.getElementById("filtro-especie").value;
+            const sexo = document.getElementById("filtro-sexo").value;
+            const edad = document.getElementById("filtro-edad").value;
             const tamano = document.getElementById("filtro-tamano").value;
+            const socializacion = document.getElementById("filtro-socializacion").value;
+            const caracter = document.getElementById("filtro-caracter").value.trim();
+            const vacuna = document.getElementById("filtro-vacunas").value;
             const soloVerif = document.getElementById("filtro-verificados").checked;
 
             if (partido) params.append("partido", partido);
             if (tipo) params.append("tipo_publicacion", tipo);
+            if (estadoAdopcion) {
+                params.append("estado_adopcion", estadoAdopcion);
+                if (estadoAdopcion === "adoptado") params.append("estado", "TODAS");
+            }
             if (especie) params.append("especie", especie);
+            if (sexo) params.append("sexo", sexo);
+            if (edad) params.append("edad", edad);
             if (tamano) params.append("tamano", tamano);
+            if (socializacion) params.append("socializacion", socializacion);
+            if (caracter) params.append("caracter", caracter);
+            if (vacuna === "CARTILLA") {
+                params.append("con_cartilla", "true");
+            } else if (vacuna) {
+                params.append("vacuna", vacuna);
+            }
             if (soloVerif) params.append("solo_verificados", "true");
 
             const grid = document.getElementById("grid-mascotas");
@@ -426,7 +569,7 @@
 
             try {
                 mascotasCache = await apiFetch(`/mascotas?${params.toString()}`);
-                document.getElementById("contador-resultados").textContent = `${mascotasCache.length} publicaciones activas`;
+                document.getElementById("contador-resultados").textContent = `${mascotasCache.length} publicaciones encontradas`;
 
                 if (mascotasCache.length === 0) {
                     grid.innerHTML = `<div class="col-span-full bg-brand-card p-8 rounded-card border border-brand-tagBg text-center text-sm text-brand-textMuted">No hay mascotas con esos filtros en este momento.</div>`;
@@ -439,16 +582,14 @@
                         ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-pill bg-brand-greenBadge text-white text-[10px] font-bold"><i class="fa-solid fa-certificate text-[9px]"></i> Municipio</span>`
                         : `<span class="inline-block px-2.5 py-0.5 rounded-pill bg-brand-tagBg text-brand-textMuted text-[10px] font-semibold">Comunitario</span>`;
 
-                    // Sanitario clave: vacunado + esterilizado
                     const sanKey = [];
-                    if (m.salud?.vacunado) sanKey.push("Vacunado");
-                    if (m.salud?.esterilizado) sanKey.push("Esterilizado");
+                    if (m.salud?.tiene_vacunas_vigentes || m.salud?.vacunado) sanKey.push("Vacunado");
+                    if (m.salud?.esterilizado || m.salud?.esterilizacion_detalle === "Si, ya está esterilizado") sanKey.push("Esterilizado");
                     const sanHTML = sanKey.length
                         ? `<span class="text-brand-greenBadge text-[10px] font-semibold">${sanKey.join(" · ")}</span>`
-                        : `<span class="text-brand-textMuted text-[10px]">Sin datos sanitarios</span>`;
+                        : `<span class="text-brand-textMuted text-[10px]">Ver sanidad</span>`;
 
-                    // Gancho breve (primeras 80 chars de descripcion si no tiene gancho)
-                    const gancho = m.gancho || (m.descripcion ? m.descripcion.substring(0, 80) + (m.descripcion.length > 80 ? "…" : "") : "");
+                    const caracterResumen = m.caracter || m.gancho || (m.descripcion ? m.descripcion.substring(0, 75) + (m.descripcion.length > 75 ? "…" : "") : "");
 
                     return `
                         <div class="bg-brand-card rounded-card p-4 border border-brand-tagBg flex flex-col justify-between">
@@ -456,7 +597,7 @@
                                 <div class="relative h-48 rounded-card overflow-hidden mb-3 border border-brand-tagBg">
                                     <img src="${m.foto_url}" alt="${m.nombre}" class="w-full h-full object-cover"
                                          onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600'">
-                                    <span class="absolute top-3 left-3 ${tipoColor} text-white text-[10px] px-3 py-1 rounded-pill font-bold uppercase">${tipoLabel(m.tipo_publicacion)}</span>
+                                    <span class="absolute top-3 left-3 ${tipoColor} text-white text-[10px] px-3 py-1 rounded-pill font-bold uppercase">${estadoAdopcionLabel(m)}</span>
                                     <span class="absolute top-3 right-3 bg-brand-textDark/80 text-white text-[10px] px-3 py-1 rounded-pill font-bold">${m.especie} ${m.sexo === "MACHO" ? "♂" : "♀"}</span>
                                 </div>
 
@@ -467,8 +608,8 @@
 
                                 <h3 class="font-serif font-bold text-xl text-brand-textDark">${m.nombre}</h3>
                                 <p class="text-xs font-semibold text-brand-primary mt-0.5">${m.partido} · ${m.zona_barrio}</p>
-                                <p class="text-xs text-brand-textMuted mt-0.5">${edadLabel(m.edad)} · ${tamanoLabel(m.tamano)}</p>
-                                ${gancho ? `<p class="text-xs text-brand-textDark mt-2 italic">"${gancho}"</p>` : ""}
+                                <p class="text-xs text-brand-textMuted mt-0.5">${edadLabel(m.edad, m.edad_detalle)} · ${tamanoLabel(m.tamano)}</p>
+                                ${caracterResumen ? `<p class="text-xs text-brand-textDark mt-2 italic">"${caracterResumen}"</p>` : ""}
                             </div>
                             <button onclick="abrirFicha('${m.id}')"
                                 class="mt-4 w-full py-2.5 bg-brand-accent hover:bg-brand-accentHover text-white rounded-pill text-xs font-semibold transition-colors">
@@ -491,15 +632,30 @@
             if (urlParams.get("tipo")) document.getElementById("filtro-tipo").value = urlParams.get("tipo");
             if (urlParams.get("partido")) selPartido.value = urlParams.get("partido");
 
-            ["filtro-partido", "filtro-tipo", "filtro-especie", "filtro-tamano", "filtro-verificados"].forEach(id => {
+            [
+                "filtro-partido", "filtro-tipo", "filtro-estado-adopcion", "filtro-especie",
+                "filtro-sexo", "filtro-edad", "filtro-tamano", "filtro-socializacion",
+                "filtro-vacunas", "filtro-verificados"
+            ].forEach(id => {
                 document.getElementById(id).addEventListener("change", cargarCatalogo);
+            });
+
+            document.getElementById("filtro-caracter").addEventListener("input", () => {
+                clearTimeout(window._carTimer);
+                window._carTimer = setTimeout(cargarCatalogo, 300);
             });
 
             document.getElementById("btn-limpiar").addEventListener("click", () => {
                 selPartido.value = "";
                 document.getElementById("filtro-tipo").value = "";
+                document.getElementById("filtro-estado-adopcion").value = "";
                 document.getElementById("filtro-especie").value = "";
+                document.getElementById("filtro-sexo").value = "";
+                document.getElementById("filtro-edad").value = "";
                 document.getElementById("filtro-tamano").value = "";
+                document.getElementById("filtro-socializacion").value = "";
+                document.getElementById("filtro-caracter").value = "";
+                document.getElementById("filtro-vacunas").value = "";
                 document.getElementById("filtro-verificados").checked = false;
                 cargarCatalogo();
             });

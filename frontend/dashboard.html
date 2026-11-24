@@ -486,21 +486,100 @@
             }
         }
 
+        const cartillas = {};
+
+        function initCartillaUploader(prefix, initialUrl = "") {
+            const input = document.getElementById(`${prefix}-cartilla-file`);
+            const previewWrap = document.getElementById(`${prefix}-cartilla-preview-wrap`);
+            const previewImg = document.getElementById(`${prefix}-cartilla-preview`);
+            const clearBtn = document.getElementById(`${prefix}-cartilla-clear`);
+            if (!input) return;
+
+            cartillas[prefix] = initialUrl || null;
+
+            const updatePreview = (url) => {
+                if (url) {
+                    previewImg.src = url;
+                    previewWrap.classList.remove("hidden");
+                } else {
+                    previewImg.src = "";
+                    previewWrap.classList.add("hidden");
+                }
+            };
+            updatePreview(cartillas[prefix]);
+
+            input.onchange = (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxDim = 900;
+                        let w = img.width, h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            const ratio = Math.min(maxDim / w, maxDim / h);
+                            w = Math.round(w * ratio);
+                            h = Math.round(h * ratio);
+                        }
+                        const c = document.createElement("canvas");
+                        c.width = w;
+                        c.height = h;
+                        c.getContext("2d").drawImage(img, 0, 0, w, h);
+                        cartillas[prefix] = c.toDataURL("image/jpeg", 0.78);
+                        updatePreview(cartillas[prefix]);
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            if (clearBtn) {
+                clearBtn.onclick = () => {
+                    cartillas[prefix] = "";
+                    input.value = "";
+                    updatePreview(null);
+                };
+            }
+        }
+
+        function initCaracterCounter(prefix) {
+            const input = document.getElementById(`${prefix}-caracter`);
+            const counter = document.getElementById(`${prefix}-caracter-restantes`);
+            if (!input || !counter) return;
+            const update = () => {
+                const rest = Math.max(0, 100 - input.value.length);
+                counter.textContent = rest;
+            };
+            input.addEventListener("input", update);
+            update();
+        }
+
         // Plantilla reutilizable de inputs del formulario de mascota
         function getMascotaFormHTML(prefix) {
             return `
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tipo de Publicación</label>
-                        <select id="${prefix}-tipo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
-                            <option value="ADOPCION">En Adopción Responsable</option>
-                            <option value="PERDIDO">Animal Perdido (Busca a su familia)</option>
-                            <option value="ENCONTRADO">Animal Encontrado en vía pública</option>
-                        </select>
+                <div class="space-y-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tipo de Publicación</label>
+                            <select id="${prefix}-tipo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <option value="ADOPCION">En Adopción Responsable</option>
+                                <option value="PERDIDO">Animal Perdido (Busca a su familia)</option>
+                                <option value="ENCONTRADO">Animal Encontrado en vía pública</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Estado</label>
+                            <select id="${prefix}-estado-adopcion" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                                <option value="en adopción">En adopción</option>
+                                <option value="en tránsito">En tránsito</option>
+                                <option value="adoptado">Adoptado</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Nombre / Referencia</label>
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Nombre</label>
                         <input type="text" id="${prefix}-nombre" required placeholder="Ej: Milo / Cachorro mestizo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
                     </div>
 
@@ -513,7 +592,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Sexo</label>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Género</label>
                             <select id="${prefix}-sexo" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
                                 <option value="MACHO">Macho</option>
                                 <option value="HEMBRA">Hembra</option>
@@ -521,36 +600,42 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-3 gap-2">
                         <div>
                             <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Tamaño</label>
-                            <select id="${prefix}-tamano" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            <select id="${prefix}-tamano" class="w-full px-3 py-2.5 bg-white border border-brand-tagBg rounded-pill text-xs">
                                 <option value="PEQUENO">Pequeño</option>
                                 <option value="MEDIANO">Mediano</option>
                                 <option value="GRANDE">Grande</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Edad</label>
-                            <select id="${prefix}-edad" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Rango Edad</label>
+                            <select id="${prefix}-edad" class="w-full px-3 py-2.5 bg-white border border-brand-tagBg rounded-pill text-xs">
                                 <option value="CACHORRO">Cachorro</option>
+                                <option value="JOVEN">Joven</option>
                                 <option value="ADULTO">Adulto</option>
-                                <option value="SENIOR">Senior (+7 años)</option>
+                                <option value="MAYOR">Mayor (+7 años)</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Edad exacta</label>
+                            <input type="text" id="${prefix}-edad-detalle" placeholder="Ej: 2 años / 4 meses" class="w-full px-3 py-2.5 bg-white border border-brand-tagBg rounded-pill text-xs">
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Barrio / Zona Exacta</label>
-                        <input type="text" id="${prefix}-zona" required placeholder="Ej: Barrio San Martín / Plaza Central" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Localidad / Barrio</label>
+                            <input type="text" id="${prefix}-zona" required placeholder="Ej: Barrio San Martín / Centro" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">WhatsApp de Contacto (Opcional)</label>
+                            <input type="text" id="${prefix}-whatsapp" placeholder="Ej: 5491122334455" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">WhatsApp de Contacto (Opcional)</label>
-                        <input type="text" id="${prefix}-whatsapp" placeholder="Ej: 5491122334455" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
-                    </div>
-
-                    <!-- SUBIDA DE FOTO DESDE ARCHIVO Y ACOMODO EN CANVAS -->
+                    <!-- SUBIDA DE FOTO PRINCIPAL DESDE ARCHIVO Y ACOMODO EN CANVAS -->
                     <div class="bg-white p-3.5 rounded-card border border-brand-tagBg space-y-2.5">
                         <label class="block text-xs font-bold text-brand-textMuted uppercase">Foto del Animal (Archivo + Acomodo)</label>
                         <input type="file" id="${prefix}-foto-file" accept="image/*" class="w-full text-xs text-brand-textMuted file:mr-3 file:py-1.5 file:px-4 file:rounded-pill file:border-0 file:text-xs file:font-bold file:bg-brand-tagBg file:text-brand-textDark hover:file:bg-brand-accent hover:file:text-white cursor-pointer">
@@ -563,28 +648,85 @@
                         <p class="text-[11px] text-brand-textMuted">Arrastrá la imagen sobre el recuadro para acomodarla. Se comprimirá automáticamente al guardar.</p>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Gancho Breve (opcional)</label>
-                        <input type="text" id="${prefix}-gancho" placeholder="Ej: Súper compañero, ideal para departamento" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
+                    <!-- PERFIL DEL ANIMAL: CARÁCTER, SOCIALIZACIÓN E HISTORIA -->
+                    <div class="bg-white p-4 rounded-card border border-brand-tagBg space-y-3">
+                        <h4 class="text-xs font-bold text-brand-primary uppercase tracking-wider">Perfil del animal</h4>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-brand-textMuted uppercase">Carácter en 3 palabras</label>
+                                <span class="text-[11px] font-semibold text-brand-accent">Caracteres restantes: <span id="${prefix}-caracter-restantes">100</span></span>
+                            </div>
+                            <input type="text" id="${prefix}-caracter" maxlength="100" placeholder="Ej: juguetón, limpio, tranquilo" class="w-full px-4 py-2.5 bg-brand-bg border border-brand-tagBg rounded-pill text-sm">
+                            <p class="text-[10px] text-brand-textMuted mt-1">Ejemplos: juguetón, limpio, inteligente, protector, tranquilo, tosco, encimoso, independiente, ladrador, etc.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Socialización</label>
+                            <select id="${prefix}-socializacion" class="w-full px-4 py-2.5 bg-brand-bg border border-brand-tagBg rounded-pill text-xs">
+                                <option value="">Seleccionar nivel de socialización...</option>
+                                <option value="Es muy sociable (Convive bien con perros, gatos y convive con niños)">Es muy sociable (Convive bien con perros, gatos y convive con niños)</option>
+                                <option value="Es sociable (Convive bien con perros y gatos)">Es sociable (Convive bien con perros y gatos)</option>
+                                <option value="Es sociable (Convive con gatos)">Es sociable (Convive con gatos)</option>
+                                <option value="Es sociable (Convive con perros y niños)">Es sociable (Convive con perros y niños)</option>
+                                <option value="Es dominante (Convive sólo con algunos animales y puede convivir con niños)">Es dominante (Convive sólo con algunos animales y puede convivir con niños)</option>
+                                <option value="Es miedoso (Reacciona por miedo, no convive con niños)">Es miedoso (Reacciona por miedo, no convive con niños)</option>
+                                <option value="Debe ser único (es reactivo, no convive con niños)">Debe ser único (es reactivo, no convive con niños)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Gancho Breve (opcional)</label>
+                            <input type="text" id="${prefix}-gancho" placeholder="Ej: Súper compañero, ideal para departamento" class="w-full px-4 py-2.5 bg-brand-bg border border-brand-tagBg rounded-pill text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Cuéntanos más sobre la mascota que das en adopción</label>
+                            <textarea id="${prefix}-desc" rows="3" required placeholder="Contá su historia, rutina, cómo fue rescatado y qué hogar busca..." class="w-full p-3 bg-brand-bg border border-brand-tagBg rounded-card text-sm"></textarea>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Convivencia (opcional)</label>
-                        <input type="text" id="${prefix}-convivencia" placeholder="Ej: Se lleva bien con perros, gatos y niños" class="w-full px-4 py-2.5 bg-white border border-brand-tagBg rounded-pill">
-                    </div>
+                    <!-- SALUD Y ESTERILIZACIÓN -->
+                    <div class="bg-white p-4 rounded-card border border-brand-tagBg space-y-3">
+                        <h4 class="text-xs font-bold text-brand-greenBadge uppercase tracking-wider">Salud y Esterilización</h4>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Perfil del animal</label>
-                        <textarea id="${prefix}-desc" rows="3" required placeholder="Contá su historia, carácter, rutina y cuidados especiales..." class="w-full p-3 bg-white border border-brand-tagBg rounded-card"></textarea>
-                    </div>
+                        <div>
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1">Esterilización</label>
+                            <select id="${prefix}-esterilizacion" class="w-full px-4 py-2.5 bg-brand-bg border border-brand-tagBg rounded-pill text-xs">
+                                <option value="Si, ya está esterilizado">Si, ya está esterilizado</option>
+                                <option value="No, es Menor de 5 meses y aún no está esterilizado">No, es Menor de 5 meses y aún no está esterilizado</option>
+                                <option value="No, es Mayor de 5 meses y aún no está esterilizado">No, es Mayor de 5 meses y aún no está esterilizado</option>
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-xs font-bold text-brand-textMuted uppercase mb-1.5">Estado Sanitario</label>
-                        <div class="grid grid-cols-2 gap-2 text-xs bg-white p-3 rounded-card border border-brand-tagBg">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-vac"> Vacunado</label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-rab"> Antirrábica</label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-est"> Esterilizado</label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${prefix}-des"> Desparasitado</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                            <label class="flex items-center gap-2 text-xs font-semibold text-brand-textDark cursor-pointer bg-brand-bg px-3.5 py-2.5 rounded-pill border border-brand-tagBg">
+                                <input type="checkbox" id="${prefix}-vac-vigentes" class="rounded">
+                                <span>Vacunas vigentes</span>
+                            </label>
+                            <div>
+                                <label class="block text-[10px] font-bold text-brand-textMuted uppercase mb-1">Última desparasitación interna</label>
+                                <input type="date" id="${prefix}-fecha-desp" class="w-full px-3.5 py-2 bg-brand-bg border border-brand-tagBg rounded-pill text-xs">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-brand-textMuted uppercase mb-1.5">Vacunas incluidas (opcional)</label>
+                            <div class="grid grid-cols-2 gap-1.5 text-xs">
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="${prefix}-vac-item" value="Antirrábica"> Antirrábica</label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="${prefix}-vac-item" value="Séxtuple / Quíntuple"> Séxtuple / Quíntuple</label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="${prefix}-vac-item" value="Triple Felina"> Triple Felina</label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="${prefix}-vac-item" value="Tos de las perreras"> Tos de las perreras</label>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-brand-tagBg space-y-2">
+                            <label class="block text-xs font-bold text-brand-textMuted uppercase">Foto de la cartilla de vacunación (opcional)</label>
+                            <input type="file" id="${prefix}-cartilla-file" accept="image/*" class="w-full text-xs text-brand-textMuted file:mr-3 file:py-1.5 file:px-4 file:rounded-pill file:border-0 file:text-xs file:font-bold file:bg-brand-tagBg file:text-brand-textDark hover:file:bg-brand-greenBadge hover:file:text-white cursor-pointer">
+                            <div id="${prefix}-cartilla-preview-wrap" class="hidden space-y-2">
+                                <img id="${prefix}-cartilla-preview" src="" alt="Cartilla de vacunación" class="w-full max-h-48 object-contain rounded-card border border-brand-tagBg bg-brand-bg">
+                                <button type="button" id="${prefix}-cartilla-clear" class="text-[11px] font-bold text-brand-accent hover:underline">Quitar foto de cartilla</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -596,24 +738,39 @@
             if (!fotoData) {
                 throw new Error("Por favor seleccioná una foto del animal desde tu dispositivo.");
             }
+            const esterilDetalle = document.getElementById(`${prefix}-esterilizacion`).value;
+            const vacVigentes = document.getElementById(`${prefix}-vac-vigentes`).checked;
+            const fechaDesp = document.getElementById(`${prefix}-fecha-desp`).value || null;
+            const vacunasIncluidas = Array.from(document.querySelectorAll(`.${prefix}-vac-item:checked`)).map(el => el.value);
+            const socializacion = document.getElementById(`${prefix}-socializacion`).value;
+
             return {
                 tipo_publicacion: document.getElementById(`${prefix}-tipo`).value,
+                estado_adopcion: document.getElementById(`${prefix}-estado-adopcion`).value,
                 nombre: document.getElementById(`${prefix}-nombre`).value.trim(),
                 especie: document.getElementById(`${prefix}-especie`).value,
                 sexo: document.getElementById(`${prefix}-sexo`).value,
                 tamano: document.getElementById(`${prefix}-tamano`).value,
                 edad: document.getElementById(`${prefix}-edad`).value,
+                edad_detalle: document.getElementById(`${prefix}-edad-detalle`).value.trim() || null,
                 zona_barrio: document.getElementById(`${prefix}-zona`).value.trim(),
                 whatsapp_contacto: document.getElementById(`${prefix}-whatsapp`).value.trim() || undefined,
                 foto_url: fotoData,
+                caracter: document.getElementById(`${prefix}-caracter`).value.trim(),
+                socializacion: socializacion || null,
                 gancho: document.getElementById(`${prefix}-gancho`).value.trim(),
-                convivencia: document.getElementById(`${prefix}-convivencia`).value.trim(),
+                convivencia: socializacion || "",
                 descripcion: document.getElementById(`${prefix}-desc`).value.trim(),
                 salud: {
-                    vacunado: document.getElementById(`${prefix}-vac`).checked,
-                    antirrabica: document.getElementById(`${prefix}-rab`).checked,
-                    esterilizado: document.getElementById(`${prefix}-est`).checked,
-                    desparasitado: document.getElementById(`${prefix}-des`).checked
+                    vacunado: vacVigentes || vacunasIncluidas.length > 0,
+                    antirrabica: vacunasIncluidas.includes("Antirrábica"),
+                    esterilizado: esterilDetalle === "Si, ya está esterilizado",
+                    desparasitado: Boolean(fechaDesp),
+                    tiene_vacunas_vigentes: vacVigentes,
+                    cartilla_vacunacion_url: cartillas[prefix] !== undefined ? cartillas[prefix] : null,
+                    fecha_desparasitacion: fechaDesp,
+                    esterilizacion_detalle: esterilDetalle,
+                    vacunas_incluidas: vacunasIncluidas
                 }
             };
         }
@@ -656,22 +813,34 @@
             document.getElementById("fields-mascota-edit").innerHTML = getMascotaFormHTML("me");
 
             document.getElementById("me-tipo").value = m.tipo_publicacion || "ADOPCION";
+            document.getElementById("me-estado-adopcion").value = m.estado_adopcion || (m.estado === "RESUELTA" ? "adoptado" : "en adopción");
             document.getElementById("me-nombre").value = m.nombre || "";
             document.getElementById("me-especie").value = m.especie || "PERRO";
             document.getElementById("me-sexo").value = m.sexo || "MACHO";
             document.getElementById("me-tamano").value = m.tamano || "MEDIANO";
-            document.getElementById("me-edad").value = m.edad || "ADULTO";
+            const edadNorm = (m.edad || "ADULTO").toUpperCase();
+            document.getElementById("me-edad").value = edadNorm === "SENIOR" ? "MAYOR" : edadNorm;
+            document.getElementById("me-edad-detalle").value = m.edad_detalle || "";
             document.getElementById("me-zona").value = m.zona_barrio || "";
             document.getElementById("me-whatsapp").value = m.whatsapp_contacto || "";
+            document.getElementById("me-caracter").value = m.caracter || "";
+            document.getElementById("me-socializacion").value = m.socializacion || m.convivencia || "";
             document.getElementById("me-gancho").value = m.gancho || "";
-            document.getElementById("me-convivencia").value = m.convivencia || "";
             document.getElementById("me-desc").value = m.descripcion || "";
-            document.getElementById("me-vac").checked = Boolean(m.salud?.vacunado);
-            document.getElementById("me-rab").checked = Boolean(m.salud?.antirrabica);
-            document.getElementById("me-est").checked = Boolean(m.salud?.esterilizado);
-            document.getElementById("me-des").checked = Boolean(m.salud?.desparasitado);
+
+            const estVal = m.salud?.esterilizacion_detalle || (m.salud?.esterilizado ? "Si, ya está esterilizado" : "No, es Mayor de 5 meses y aún no está esterilizado");
+            document.getElementById("me-esterilizacion").value = estVal;
+            document.getElementById("me-vac-vigentes").checked = Boolean(m.salud?.tiene_vacunas_vigentes || m.salud?.vacunado);
+            document.getElementById("me-fecha-desp").value = m.salud?.fecha_desparasitacion || "";
+
+            const vacs = m.salud?.vacunas_incluidas || [];
+            document.querySelectorAll(".me-vac-item").forEach(cb => {
+                cb.checked = vacs.includes(cb.value) || (cb.value === "Antirrábica" && Boolean(m.salud?.antirrabica));
+            });
 
             initPhotoCropper("me", m.foto_url || "");
+            initCartillaUploader("me", m.salud?.cartilla_vacunacion_url || "");
+            initCaracterCounter("me");
             document.getElementById("modal-editar-mascota").classList.remove("hidden");
         }
 
@@ -1233,6 +1402,8 @@
                 document.getElementById("view-admin-municipal").classList.remove("hidden");
                 document.getElementById("fields-mascota-admin").innerHTML = getMascotaFormHTML("ma");
                 initPhotoCropper("ma");
+                initCartillaUploader("ma");
+                initCaracterCounter("ma");
 
                 cargarMetricasPartido();
                 cargarAnimalesPartidoAdmin();
@@ -1283,6 +1454,8 @@
                         });
                         e.target.reset();
                         initPhotoCropper("ma");
+                        initCartillaUploader("ma");
+                        initCaracterCounter("ma");
                         alert("Publicación oficial registrada con éxito.");
                         cambiarPestanaAdmin("animales");
                         cargarMetricasPartido();
@@ -1297,6 +1470,8 @@
                 document.getElementById("view-user-standard").classList.remove("hidden");
                 document.getElementById("fields-mascota-user").innerHTML = getMascotaFormHTML("mu");
                 initPhotoCropper("mu");
+                initCartillaUploader("mu");
+                initCaracterCounter("mu");
 
                 cargarMisPublicacionesUser();
 
@@ -1310,6 +1485,8 @@
                         });
                         e.target.reset();
                         initPhotoCropper("mu");
+                        initCartillaUploader("mu");
+                        initCaracterCounter("mu");
                         alert("Mascota publicada con éxito.");
                         cargarMisPublicacionesUser();
                     } catch (err) {
