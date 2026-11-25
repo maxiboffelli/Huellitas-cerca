@@ -53,11 +53,10 @@ function renderNavbar(activePage) {
     header.innerHTML = `
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
             <a href="index.html" class="flex items-center gap-3">
-                <img src="assets/logo-pata.png" alt="Logo Código Pescar" class="w-9 h-9 object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <img src="assets/pata.png" style="filter: hue-rotate(65deg);"alt="Logo Código Pescar" class="w-9 h-9 object-contain" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                 <i class="fa-solid fa-paw text-brand-accent text-2xl hidden"></i>
                 <div class="flex flex-col">
-                    <span class="font-bold text-lg tracking-tight leading-none text-brand-primary">${CONFIG.APP_NAME} <span class="text-brand-accent">&mdash;</span> ${CONFIG.APP_SUBTITLE_LONG}</span>
-                    <span class="text-[10px] tracking-widest uppercase text-brand-textMuted font-semibold">${CONFIG.SUBTITLE}</span>
+                    <span class="font-bold text-lg tracking-tight leading-none text-brand-primary">${CONFIG.APP_NAME}</span>
                 </div>
             </a>
             <nav class="flex flex-wrap items-center gap-1 bg-brand-tagBg/40 p-1 rounded-pill border border-brand-tagBg">

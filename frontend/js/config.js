@@ -3,9 +3,9 @@ const isLocal = !window.location.hostname || window.location.hostname === "local
 const API_BASE = isLocal ? "http://127.0.0.1:8000" : PROD_API_URL.replace(/\/$/, "");
 
 const CONFIG = {
-    APP_NAME: "Código Pescar",
-    APP_SUBTITLE_LONG: "Refugios & Vos",
-    SUBTITLE: "REFUGIOS & VOS — GESTIÓN MUNICIPAL",
+    APP_NAME: "HUELLITAS CERCA",
+    APP_SUBTITLE_LONG: "",
+    SUBTITLE: "",
     API_BASE_URL: `${API_BASE}/api`,
     PARTIDOS_BUENOS_AIRES: [
         "Tandil",
@@ -38,10 +38,10 @@ const TAILWIND_BRAND_CONFIG = {
                 brand: {
                     bg: '#F5F2EB',
                     card: '#FAF8F5',
-                    primary: '#6B6B58',
-                    secondary: '#A7B07A',
-                    accent: '#C86D51',
-                    accentHover: '#B25A40',
+                    primary: '#9abb37',
+                    secondary: '#272d08',
+                    accent: '#556B2F',
+                    accentHover: '#435624',
                     textDark: '#3A3A32',
                     textMuted: '#7A7A6E',
                     tagBg: '#E8E4D9',
