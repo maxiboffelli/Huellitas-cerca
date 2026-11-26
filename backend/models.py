@@ -62,6 +62,7 @@ class MascotaCreate(BaseModel):
     caracter: Optional[str] = Field(None, max_length=100)
     socializacion: Optional[str] = None
     foto_url: str
+    fotos_adicionales: list[str] = Field(default_factory=list)
     gancho: Optional[str] = None
     convivencia: Optional[str] = None
     salud: SaludMascota = Field(default_factory=SaludMascota)
@@ -86,6 +87,7 @@ class MascotaUpdate(BaseModel):
     gancho: Optional[str] = None
     convivencia: Optional[str] = None
     foto_url: Optional[str] = None
+    fotos_adicionales: Optional[list[str]] = None
     salud: Optional[SaludMascota] = None
     whatsapp_contacto: Optional[str] = None
 

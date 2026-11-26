@@ -143,6 +143,7 @@ async def crear_mascota(payload: MascotaCreate, current_user: dict = Depends(get
         "gancho": payload.gancho or "",
         "convivencia": payload.convivencia or "",
         "foto_url": payload.foto_url,
+        "fotos_adicionales": payload.fotos_adicionales or [],
         "salud": salud_dict,
         "whatsapp_contacto": payload.whatsapp_contacto or current_user.get("whatsapp", ""),
         "creado_en": datetime.now(timezone.utc),

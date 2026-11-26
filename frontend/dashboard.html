@@ -543,6 +543,72 @@
             }
         }
 
+        const extraFotos = {};
+
+        function quitarExtraFoto(prefix, index) {
+            if (!Array.isArray(extraFotos[prefix])) return;
+            extraFotos[prefix].splice(index, 1);
+            if (typeof extraFotos[prefix]._render === "function") {
+                extraFotos[prefix]._render();
+            }
+        }
+
+        function initExtraFotosUploader(prefix, initialUrls = []) {
+            const input = document.getElementById(`${prefix}-extra-fotos-file`);
+            const listEl = document.getElementById(`${prefix}-extra-fotos-list`);
+            if (!input || !listEl) return;
+
+            extraFotos[prefix] = Array.isArray(initialUrls) ? [...initialUrls] : [];
+
+            const renderThumbs = () => {
+                if (!extraFotos[prefix].length) {
+                    listEl.innerHTML = `<p class="text-[11px] text-brand-textMuted whitespace-nowrap">Sin fotos adicionales cargadas.</p>`;
+                    return;
+                }
+                listEl.innerHTML = extraFotos[prefix].map((url, idx) => `
+                    <div class="relative rounded-card overflow-hidden border border-brand-tagBg aspect-square bg-brand-bg">
+                        <img src="${url}" alt="Foto extra ${idx + 1}" class="w-full h-full object-cover">
+                        <button type="button" onclick="quitarExtraFoto('${prefix}', ${idx})"
+                            class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/75 text-white text-xs flex items-center justify-center hover:bg-brand-accent transition-colors"
+                            title="Quitar foto">&times;</button>
+                    </div>
+                `).join("");
+            };
+
+            extraFotos[prefix]._render = renderThumbs;
+            renderThumbs();
+
+            input.onchange = (e) => {
+                const files = Array.from(e.target.files || []);
+                if (!files.length) return;
+
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const maxDim = 900;
+                            let w = img.width, h = img.height;
+                            if (w > maxDim || h > maxDim) {
+                                const ratio = Math.min(maxDim / w, maxDim / h);
+                                w = Math.round(w * ratio);
+                                h = Math.round(h * ratio);
+                            }
+                            const c = document.createElement("canvas");
+                            c.width = w;
+                            c.height = h;
+                            c.getContext("2d").drawImage(img, 0, 0, w, h);
+                            extraFotos[prefix].push(c.toDataURL("image/jpeg", 0.78));
+                            renderThumbs();
+                        };
+                        img.src = ev.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+                input.value = "";
+            };
+        }
+
         function initCaracterCounter(prefix) {
             const input = document.getElementById(`${prefix}-caracter`);
             const counter = document.getElementById(`${prefix}-caracter-restantes`);
@@ -646,6 +712,12 @@
                             <button type="button" id="${prefix}-reset-crop" class="px-3 py-1 rounded-pill bg-brand-tagBg text-[11px] font-bold hover:bg-brand-primary hover:text-white">Centrar</button>
                         </div>
                         <p class="text-[11px] text-brand-textMuted">Arrastrá la imagen sobre el recuadro para acomodarla. Se comprimirá automáticamente al guardar.</p>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-card border border-brand-tagBg space-y-2.5">
+                        <label class="block text-xs font-bold text-brand-textMuted uppercase">Fotos adicionales para el expediente (opcional)</label>
+                        <input type="file" id="${prefix}-extra-fotos-file" accept="image/*" multiple class="w-full text-xs text-brand-textMuted file:mr-3 file:py-1.5 file:px-4 file:rounded-pill file:border-0 file:text-xs file:font-bold file:bg-brand-tagBg file:text-brand-textDark hover:file:bg-brand-primary hover:file:text-white cursor-pointer">
+                        <div id="${prefix}-extra-fotos-list" class="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1"></div>
                     </div>
 
                     <!-- PERFIL DEL ANIMAL: CARÁCTER, SOCIALIZACIÓN E HISTORIA -->
@@ -756,6 +828,7 @@
                 zona_barrio: document.getElementById(`${prefix}-zona`).value.trim(),
                 whatsapp_contacto: document.getElementById(`${prefix}-whatsapp`).value.trim() || undefined,
                 foto_url: fotoData,
+                fotos_adicionales: extraFotos[prefix] || [],
                 caracter: document.getElementById(`${prefix}-caracter`).value.trim(),
                 socializacion: socializacion || null,
                 gancho: document.getElementById(`${prefix}-gancho`).value.trim(),
@@ -839,7 +912,9 @@
             });
 
             initPhotoCropper("me", m.foto_url || "");
+            initExtraFotosUploader("me", m.fotos_adicionales || []);
             initCartillaUploader("me", m.salud?.cartilla_vacunacion_url || "");
+            
             initCaracterCounter("me");
             document.getElementById("modal-editar-mascota").classList.remove("hidden");
         }
@@ -1401,6 +1476,7 @@
             if (currentUser.rol === "ADMIN_MUNICIPAL") {
                 document.getElementById("view-admin-municipal").classList.remove("hidden");
                 document.getElementById("fields-mascota-admin").innerHTML = getMascotaFormHTML("ma");
+                initExtraFotosUploader("ma");
                 initPhotoCropper("ma");
                 initCartillaUploader("ma");
                 initCaracterCounter("ma");
@@ -1453,6 +1529,7 @@
                             body: JSON.stringify(data)
                         });
                         e.target.reset();
+                        initExtraFotosUploader("ma");
                         initPhotoCropper("ma");
                         initCartillaUploader("ma");
                         initCaracterCounter("ma");
@@ -1470,6 +1547,7 @@
                 document.getElementById("view-user-standard").classList.remove("hidden");
                 document.getElementById("fields-mascota-user").innerHTML = getMascotaFormHTML("mu");
                 initPhotoCropper("mu");
+                initExtraFotosUploader("mu");
                 initCartillaUploader("mu");
                 initCaracterCounter("mu");
 
@@ -1485,6 +1563,7 @@
                         });
                         e.target.reset();
                         initPhotoCropper("mu");
+                        initExtraFotosUploader("mu");
                         initCartillaUploader("mu");
                         initCaracterCounter("mu");
                         alert("Mascota publicada con éxito.");
